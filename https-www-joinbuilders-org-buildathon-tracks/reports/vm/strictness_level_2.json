@@ -1,0 +1,54 @@
+{
+  "level": 2,
+  "name": "Missing information",
+  "runs": [
+    {
+      "level": 2,
+      "name": "Missing information",
+      "seed": 17,
+      "actions": 120,
+      "invalid_actions": 0,
+      "missed_ticks": 0,
+      "exceptions": [],
+      "latency_ms": {
+        "median": 0.205715,
+        "p95": 1.06397,
+        "p99": 1.32701,
+        "max": 1.33386
+      },
+      "late_actions": 0,
+      "peak_python_bytes": 160120,
+      "process_peak_rss_bytes": 18874368,
+      "memory_note": "process lifetime peak; allocation sample is separate from latency",
+      "safety_rule_violations": [],
+      "assertion_failures": [],
+      "timing_failures": [],
+      "map": null,
+      "note": "Synthetic/recorded implementation checks only; no gameplay or placement result. Official Docker checker is a separate gate."
+    },
+    {
+      "level": 2,
+      "name": "Missing information",
+      "seed": 29,
+      "actions": 120,
+      "invalid_actions": 0,
+      "missed_ticks": 0,
+      "exceptions": [],
+      "latency_ms": {
+        "median": 0.203635,
+        "p95": 1.07248,
+        "p99": 1.31795,
+        "max": 1.32631
+      },
+      "late_actions": 0,
+      "peak_python_bytes": 157000,
+      "process_peak_rss_bytes": 63213568,
+      "memory_note": "process lifetime peak; allocation sample is separate from latency",
+      "safety_rule_violations": [],
+      "assertion_failures": [],
+      "timing_failures": [],
+      "map": null,
+      "note": "Synthetic/recorded implementation checks only; no gameplay or placement result. Official Docker checker is a separate gate."
+    }
+  ]
+}

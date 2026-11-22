@@ -1,0 +1,10 @@
+bot: sudo docker run --rm -i --platform linux/amd64 --network none --cpus 1 --memory 512m --read-only --tmpfs /tmp:rw,size=64m --user 65534:65534 -v /home/ayode/mech-royale/work/official-kit/mechfight-kit/arena:/arena:ro mech-agent:map-aware
+ready in 3855 ms: name 'mech-royale-survivor'
+pass 1: 55 of 300 observations missed the 50 ms budget; this machine may be busy, running the stream again with a fresh bot
+pass 2: 55 of 300 observations missed the 50 ms budget; this machine may be busy, running the stream again with a fresh bot
+pass 3 of 3:
+observations: 300  answered in time: 244  missed the 50 ms budget: 56 (56 came late)
+answer time ms: p50 36.6  p90 79.1  p99 169.2  max 218.9  (this machine, not the 1-CPU match container)
+answers to older queued observations (dropped): 0  wrong tick: 0  bad lines: 0  debug drawings: 0 (0 over the caps)
+problem: 56 of 300 observations got no answer within 50 ms (best of 3 passes)
+FAIL

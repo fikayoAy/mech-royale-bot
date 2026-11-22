@@ -1,0 +1,94 @@
+{
+  "level": 5,
+  "name": "Tournament-grade stress",
+  "runs": [
+    {
+      "level": 5,
+      "name": "Tournament-grade stress",
+      "seed": 17,
+      "actions": 1500,
+      "invalid_actions": 0,
+      "missed_ticks": 0,
+      "exceptions": [],
+      "latency_ms": {
+        "median": 2.8362800000000004,
+        "p95": 3.10406,
+        "p99": 3.55946,
+        "max": 7.29615
+      },
+      "late_actions": 0,
+      "peak_python_bytes": 9081097,
+      "process_peak_rss_bytes": 63213568,
+      "memory_note": "process lifetime peak; allocation sample is separate from latency",
+      "safety_rule_violations": [],
+      "assertion_failures": [],
+      "timing_failures": [],
+      "map": {
+        "prisms": 259,
+        "trees": 1560,
+        "terrain_samples": 774680,
+        "bounds": {
+          "minX": -512.38,
+          "maxX": 555.08,
+          "minY": -333.09,
+          "maxY": 388.64
+        },
+        "load_error": null,
+        "scenery_sections": [
+          "blocks",
+          "stadium",
+          "cars",
+          "parking",
+          "water",
+          "barriers",
+          "stats"
+        ]
+      },
+      "note": "Synthetic/recorded implementation checks only; no gameplay or placement result. Official Docker checker is a separate gate."
+    },
+    {
+      "level": 5,
+      "name": "Tournament-grade stress",
+      "seed": 29,
+      "actions": 1500,
+      "invalid_actions": 0,
+      "missed_ticks": 0,
+      "exceptions": [],
+      "latency_ms": {
+        "median": 2.827515,
+        "p95": 3.12913,
+        "p99": 3.55293,
+        "max": 5.20254
+      },
+      "late_actions": 0,
+      "peak_python_bytes": 9080977,
+      "process_peak_rss_bytes": 63746048,
+      "memory_note": "process lifetime peak; allocation sample is separate from latency",
+      "safety_rule_violations": [],
+      "assertion_failures": [],
+      "timing_failures": [],
+      "map": {
+        "prisms": 259,
+        "trees": 1560,
+        "terrain_samples": 774680,
+        "bounds": {
+          "minX": -512.38,
+          "maxX": 555.08,
+          "minY": -333.09,
+          "maxY": 388.64
+        },
+        "load_error": null,
+        "scenery_sections": [
+          "blocks",
+          "stadium",
+          "cars",
+          "parking",
+          "water",
+          "barriers",
+          "stats"
+        ]
+      },
+      "note": "Synthetic/recorded implementation checks only; no gameplay or placement result. Official Docker checker is a separate gate."
+    }
+  ]
+}

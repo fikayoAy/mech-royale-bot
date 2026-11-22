@@ -1,0 +1,87 @@
+{
+  "captured_utc": "2026-11-22T02:59:22.031338+00:00",
+  "unit_tests": {
+    "passed": 20,
+    "failures": 0
+  },
+  "checks": {
+    "workstation": {
+      "levels": 5,
+      "seeds": [
+        17,
+        29
+      ],
+      "passed": true,
+      "actions": 4120,
+      "max_p99_ms": 17.8705,
+      "peak_rss_bytes": 68292608
+    },
+    "vm_native_arm64": {
+      "levels": 5,
+      "seeds": [
+        17,
+        29
+      ],
+      "passed": true,
+      "actions": 4120,
+      "max_p99_ms": 3.55946,
+      "peak_rss_bytes": 63746048
+    },
+    "official_vm_native": {
+      "passed": true,
+      "p99_ms": 2.5,
+      "answered_on_time": 300,
+      "total": 300
+    },
+    "official_docker_amd64_emulated": {
+      "passed": true,
+      "p99_ms": 41.0,
+      "answered_on_time": 298,
+      "late": 2,
+      "total": 300,
+      "runtime": "1 CPU, 512 MB, no network, uid 65534, read-only root/map, 64 MB tmpfs",
+      "note": "AMD64 emulation on ARM64; not competition-host speed."
+    }
+  },
+  "sandbox_peak_rss_bytes": 67461120,
+  "vm_source_matches_workspace": true,
+  "source_sha256": {
+    "bot.py": "315ca75abfc3f709d1245e78481e4aff1b96cd973754706ae3043ce24e10583d",
+    "arena_map.py": "b2a02d0f2e4914e812ee0a0fac1913a936f61b772d4e18583d76a9bad79845a7",
+    "navigation.py": "82490b4cf3d615d2f242368e884510c752a47f333322afc8b012b23522778712",
+    "combat.py": "f7d4f876462cf52562f2e60e8a6d11c80b66812965f168a9bc3d535f82362a3f",
+    "mechfight.py": "62fbcc3eeb63a64baeebcba0a8b101ca9f520c6100061b54147a5b62f45e2719",
+    "Dockerfile": "edfeb534d63f247954e7563e72e7427ee0628546823be67446a8e098b989e5b2"
+  },
+  "public_map_coverage": {
+    "prisms": 259,
+    "trees": 1560,
+    "terrain_samples": 774680,
+    "bounds": {
+      "minX": -512.38,
+      "maxX": 555.08,
+      "minY": -333.09,
+      "maxY": 388.64
+    },
+    "load_error": null,
+    "scenery_sections": [
+      "blocks",
+      "stadium",
+      "cars",
+      "parking",
+      "water",
+      "barriers",
+      "stats"
+    ]
+  },
+  "candidate_repository_bytes_before_summary": 133576,
+  "real_matches_run": 0,
+  "published": false,
+  "submitted": false,
+  "remaining_limits": [
+    "Planning physics is approximate; server collision remains authoritative.",
+    "6 m routes and bounded search can miss narrow passages or distant routes.",
+    "No hidden spawn/loot/NPC-home data is available or invented.",
+    "Placement improvement requires real practice matches."
+  ]
+}

@@ -1,0 +1,7 @@
+.git
+reports
+tests
+work
+outputs
+count_video_samples.py
+__pycache__
