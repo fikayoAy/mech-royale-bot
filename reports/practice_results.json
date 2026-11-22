@@ -1,0 +1,16 @@
+{
+  "entries": [
+    {
+      "receipt": "BB-E16EF5BF",
+      "reported_score": 0.25,
+      "commit": "38c5e47a7505",
+      "source": "user-provided scored entry",
+      "average_place_from_score": 15.75,
+      "queue_wait_ms": 95,
+      "queue_label_source": "https://www.joinbuilders.org/_next/static/immutable/chunks/10cygbhcf1s8b.js",
+      "replay_available": false,
+      "cause_of_deaths": "Unknown; no replay or per-match trace supplied."
+    }
+  ],
+  "new_defensive_fire_version_scored": false
+}

@@ -1,8 +1,11 @@
 {
-  "captured_utc": "2026-11-22T03:37:31.521585+00:00",
-  "state": "validated",
+  "captured_utc": "2026-11-22T04:02:55.267222+00:00",
+  "state": "validated_local_fix_not_rescored",
+  "based_on_submitted_commit": "38c5e47a7505",
+  "reported_practice_score_for_base": 0.25,
+  "new_version_practice_score": null,
   "unit_tests": {
-    "passed": 39,
+    "passed": 48,
     "failures": 0
   },
   "checks": {
@@ -14,7 +17,7 @@
         29
       ],
       "actions": 4120,
-      "max_p99_ms": 34.9761
+      "max_p99_ms": 8.0973
     },
     "vm_native_arm64": {
       "passed": true,
@@ -24,76 +27,45 @@
         29
       ],
       "actions": 4120,
-      "max_p99_ms": 5.33664
+      "max_p99_ms": 5.50793
     },
     "official_vm_native": {
       "passed": true,
-      "p99_ms": 1.7,
+      "p99_ms": 2.3,
       "answered_on_time": 300,
       "late": 0,
       "observations": 300
     },
     "official_docker_amd64_emulated": {
       "passed": true,
-      "p99_ms": 50.2,
-      "answered_on_time": 297,
-      "late": 3,
+      "p99_ms": 50.8,
+      "answered_on_time": 296,
+      "late": 4,
       "observations": 300,
-      "note": "AMD64 emulation on ARM64; this is not competition-host speed."
-    },
-    "debug_drawings": true
+      "note": "AMD64 emulation on ARM64; native AMD64 action timings are unmeasured."
+    }
   },
-  "sandbox_peak_rss_bytes": 68386816,
+  "sandbox_peak_rss_bytes": 69414912,
   "vm_source_matches_workspace": true,
   "source_sha256": {
-    "bot.py": "e21fee412ad712d0275f89ec687de92ecb7e676c3df5e2afbe4c8c4278eabdb8",
+    "bot.py": "b189ded478987e353f5851b55c960ecca50023e77fc2487c44058fe6115612f3",
     "arena_map.py": "007d0a2b7f2e9f005791324d5803b24e13e48818202d2b0912404d4e81db0f50",
     "navigation.py": "30209c711350c5e25396b4bd62885ab17cd3d9da5369225d8f9f61e3e350464d",
-    "combat.py": "f7d4f876462cf52562f2e60e8a6d11c80b66812965f168a9bc3d535f82362a3f",
-    "mechfight.py": "62fbcc3eeb63a64baeebcba0a8b101ca9f520c6100061b54147a5b62f45e2719",
+    "combat.py": "245f9cf500f1673ff5f8ed92f090f76714ea1de37af0e928874c09c5b632d00b",
+    "mechfight.py": "30c072b32bf945e6406913024b814286f3344b1a0ba29768a07e5ff13ae2873d",
     "virtual_map.py": "c2b6de32510bf1385e00dc85dd580380a2c10aa09a3e58aef4140e56021f0553",
     "Dockerfile": "42eba27ec584caebe6de42700fc5bc66c68b696fc7a1b6098f3a60d6f40b0cba"
   },
-  "public_map_coverage": {
-    "prisms": 259,
-    "trees": 1560,
-    "terrain_samples": 774680,
-    "bounds": {
-      "minX": -512.38,
-      "maxX": 555.08,
-      "minY": -333.09,
-      "maxY": 388.64
-    },
-    "load_error": null,
-    "scenery_sections": [
-      "blocks",
-      "stadium",
-      "cars",
-      "parking",
-      "water",
-      "barriers",
-      "stats"
-    ]
-  },
-  "virtual_map_layers": [
-    "sensed actors",
-    "inferred movement branches",
-    "NPCs",
-    "activity evidence",
-    "resources",
-    "zone forecasts",
-    "swept projectile threats",
-    "cover-aware route cost"
+  "changes": [
+    "Gun self-defense allowed during dodges, low-health retreat and zone movement.",
+    "Hold gun trigger through cooldown when aim/range/visibility are valid.",
+    "Prioritize current sensor targets over extrapolated tracks.",
+    "Keep collision-checked local movement while a route is being calculated.",
+    "Only compute expensive shot visibility after alignment checks."
   ],
-  "viewer": "reports/virtual_map.html",
-  "viewer_controls_checked": true,
-  "real_matches_run_by_this_workflow": 0,
-  "published_by_this_workflow": false,
-  "submitted_by_this_workflow": false,
-  "remaining_limits": [
-    "Physics, uncertainty and threat weights are planning estimates, not the server engine or calibrated probabilities.",
-    "Narrow routes can still be missed by the bounded 6 m/3 m grids.",
-    "Cover checks have a strict budget; unchecked clearance remains dangerous.",
-    "The emulated checker passed with 3 late replies; native AMD64 timing and real match placement remain unmeasured."
+  "limitations": [
+    "No replay or per-match trace was available to identify the causes of each death.",
+    "Synthetic and recorded checks do not measure placement improvement.",
+    "A new scored submission is required."
   ]
 }

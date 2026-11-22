@@ -102,7 +102,9 @@ def run_level(level,seed):
         except Exception as exc:
             exceptions.append(repr(exc));break
         if level>=3 and i%4==0 and o['self']['grounded']:
-            if any(a['fire']) or 'take' in a:violations.append('survival override allowed fire/loot')
+            if 'take' in a:violations.append('survival override allowed loot')
+            for slot,w in enumerate(o['self']['weapons']):
+                if w and a['fire'][slot] and w['kind'] not in ('gun','lightning'):violations.append('survival override began a slowing or splash attack')
             if not a['boost'] or (o['self']['grounded'] and not a['jump']):violations.append('incoming projectile not evaded')
         if level==2 and not o['mechs'] and any(a['fire']):violations.append('fired at an inferred track')
         if len(bot.tracks)>15 or len(bot.npcs)>32 or len(bot.heat)>256:violations.append('memory cap exceeded')

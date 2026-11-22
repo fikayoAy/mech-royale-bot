@@ -1,0 +1,57 @@
+{
+  "captured_utc": "2026-11-22T04:01:11.606446+00:00",
+  "host_architecture": "aarch64",
+  "map": {
+    "prisms": 259,
+    "trees": 1560,
+    "terrain_samples": 774680,
+    "bounds": {
+      "minX": -512.38,
+      "maxX": 555.08,
+      "minY": -333.09,
+      "maxY": 388.64
+    },
+    "load_error": null,
+    "scenery_sections": [
+      "blocks",
+      "stadium",
+      "cars",
+      "parking",
+      "water",
+      "barriers",
+      "stats"
+    ]
+  },
+  "solid_kinds": {
+    "building": 223,
+    "bridge": 9,
+    "stadium": 27
+  },
+  "prisms_with_holes": 59,
+  "source_sha256": {
+    "bot.py": "b189ded478987e353f5851b55c960ecca50023e77fc2487c44058fe6115612f3",
+    "arena_map.py": "007d0a2b7f2e9f005791324d5803b24e13e48818202d2b0912404d4e81db0f50",
+    "navigation.py": "30209c711350c5e25396b4bd62885ab17cd3d9da5369225d8f9f61e3e350464d",
+    "combat.py": "245f9cf500f1673ff5f8ed92f090f76714ea1de37af0e928874c09c5b632d00b",
+    "mechfight.py": "30c072b32bf945e6406913024b814286f3344b1a0ba29768a07e5ff13ae2873d",
+    "virtual_map.py": "c2b6de32510bf1385e00dc85dd580380a2c10aa09a3e58aef4140e56021f0553",
+    "Dockerfile": "42eba27ec584caebe6de42700fc5bc66c68b696fc7a1b6098f3a60d6f40b0cba"
+  },
+  "kit_sha256": null,
+  "virtual_map_layers": [
+    "sensed actors",
+    "inferred movement branches",
+    "NPCs",
+    "activity evidence",
+    "resources",
+    "zone forecasts",
+    "swept projectile threats",
+    "cover-aware route cost"
+  ],
+  "notes": [
+    "All world.json sections retained in ArenaMap.world.",
+    "Only terrain and prisms block movement/shots. Trees affect vision.",
+    "Dynamic spawns, loot and NPC homes are not in the static map.",
+    "Routes, rays and jet checks approximate physics; the server is authoritative."
+  ]
+}

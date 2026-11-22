@@ -1,0 +1,15 @@
+Sending build context to Docker daemon  125.4kB
+Step 1/4 : FROM python:3.13-slim@sha256:e48f59cdba69a3cbd9ed2cf0f348d90d45a8d350d98134cf1070bc106ee9ed90
+ ---> c0e8df938051
+Step 2/4 : WORKDIR /bot
+ ---> Using cache
+ ---> c22f114adfe7
+Step 3/4 : COPY bot.py mechfight.py arena_map.py navigation.py combat.py virtual_map.py ./
+ ---> 38f8e4c04400
+Step 4/4 : ENTRYPOINT ["python3", "-u", "/bot/bot.py"]
+ ---> [Warning] The requested image's platform (linux/amd64) does not match the detected host platform (linux/arm64/v8) and no specific platform was requested
+ ---> Running in aac9384eca4c
+Removing intermediate container aac9384eca4c
+ ---> 63c6f5350343
+Successfully built 63c6f5350343
+Successfully tagged mech-agent:defensive-combat

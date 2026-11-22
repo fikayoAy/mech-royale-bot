@@ -1,0 +1,19 @@
+{
+  "captured_utc": "2026-11-22T04:00:35.542973+00:00",
+  "host_system": "Windows-10-10.0.26200-SP0",
+  "host_architecture": "AMD64",
+  "python": "3.9.13",
+  "command": [
+    "C:\\Users\\ayode\\AppData\\Local\\Programs\\Python\\Python39\\python.exe",
+    "C:\\Users\\ayode\\machina\\mech-royale-upload-backup-20261122-030550\\work\\official-kit\\mechfight-kit\\check\\check.py",
+    "--",
+    "C:\\Users\\ayode\\AppData\\Local\\Programs\\Python\\Python39\\python.exe",
+    "-u",
+    "C:\\Users\\ayode\\machina\\mech-royale-merge\\bot.py"
+  ],
+  "exit_code": 0,
+  "elapsed_seconds": 0.75,
+  "stdout": "bot: C:\\Users\\ayode\\AppData\\Local\\Programs\\Python\\Python39\\python.exe -u C:\\Users\\ayode\\machina\\mech-royale-merge\\bot.py\nready in 153 ms: name 'mech-royale-survivor'\nobservations: 300  answered in time: 300  missed the 50 ms budget: 0 (0 came late)\nanswer time ms: p50 1.2  p90 2.2  p99 3.8  max 6.0  (this machine, not the 1-CPU match container)\nanswers to older queued observations (dropped): 0  wrong tick: 0  bad lines: 0  debug drawings: 0 (0 over the caps)\nPASS\n",
+  "stderr": "",
+  "note": "Conformance/timing on recorded observations. No match or placement result. AMD64 on an ARM host uses emulation."
+}

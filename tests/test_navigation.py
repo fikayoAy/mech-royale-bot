@@ -177,7 +177,7 @@ class PolicyTests(unittest.TestCase):
         a=bot.predict(bot.tracks[1],.1);b=bot.predict(bot.tracks[1],2.)
         self.assertGreater(b[2],a[2]);self.assertLess(b[1],a[1]);self.assertEqual(b[0],[0,0,0])
 
-    def test_zone_overrides_loot_and_low_hp_fire(self):
+    def test_zone_overrides_loot_while_retreating(self):
         bot=Bot();o=observation()
         o['self'].update(pos=[100,0,0],hp=150,in_zone=False)
         o['zone'].update(radius=60,next_radius=30,shrink_start=.2)
@@ -185,7 +185,7 @@ class PolicyTests(unittest.TestCase):
         o['mechs']=[actor()]
         a=bot.decide(o)
         self.assertEqual(bot.mode,'zone_move');self.assertNotIn('take',a)
-        self.assertFalse(any(a['fire']));self.assertTrue(a['boost'])
+        self.assertTrue(a['boost'])
         self.assertLess(a['move'][0],0)
 
     def test_wall_blocks_firing_at_official_memory_actor(self):

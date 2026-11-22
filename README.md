@@ -57,7 +57,7 @@ Enemy memory belongs only to observed mech IDs. Predictions fade, uncertainty gr
 
 Observed NPC drones have their own bounded memory. Their proximity and recent attacks affect route danger using the official aggro/chase ranges. Their hidden spawn/home positions are never guessed, and the bot does not farm drones.
 
-Survival and zone movement override loot and firing. Target and destination choices have short holding periods to reduce switching. Visible cubes, weapons and uncontested landed drops can be gathered when the route is safe.
+Survival and zone movement override loot and risky attacks. Clear, aimed gun shots can continue while dodging, retreating or moving out of the zone. New laser charges and mortar attacks remain blocked while escape takes priority. Target and destination choices have short holding periods to reduce switching. Visible cubes, weapons and uncontested landed drops can be gathered when the route is safe.
 
 Gun aim uses one intercept calculation. Mortars use gravity and a checked arc; lasers charge and release correctly. Shots must agree with actual torso aim and pass 3D obstruction checks. Inferred tracks are not fired upon.
 
@@ -108,3 +108,11 @@ The runtime entrypoint and Dockerfile are at the repository root. work/, outputs
 No repository has been published and no tournament submission has been made. The next useful strategy test is a real practice match: record placement, zone deaths, stuck time and encounter outcomes, then tune from those results. The kit has no reactive local match simulator.
 
 Official sources: [challenge](https://www.joinbuilders.org/buildathon/tracks/builders), [protocol](https://www.joinbuilders.org/buildathon/tracks/builders/files/protocol.md?inline=1), [kit](https://www.joinbuilders.org/buildathon/tracks/builders/files/mechfight-kit.tar.gz).
+
+## First practice result and defensive-fire fix
+
+The user reported score 0.25 for receipt BB-E16EF5BF at commit 38c5e47a7505. This is about 15.75th place on average under the placement formula. The displayed wait 95 ms is queue_wait_ms in the public result UI; it is not bot action latency. No replay or per-match trace was supplied.
+
+Code review confirmed that the submitted version suppressed every weapon whenever the bot was weak, dodging or urgently moving into the zone. That also disabled safe gun self-defense. The new version permits aligned, in-range, clear gun/energy-reserved lightning shots while preserving escape movement. It still blocks inferred-target fire, new slowing laser charges and risky mortar attacks under pressure. Current sensor targets take priority over extrapolated tracks. The gun trigger stays held through cooldown when a shot is otherwise valid, letting the server fire at its actual ready tick. Expensive sight checks run only after a weapon is aimed well enough to fire. Collision-checked movement also continues while an incremental route is being computed.
+
+The pressure tests now explicitly check shooting while dodging, low-health retreat, zone escape, energy reserves and stale-target rejection. This correction has no new scored match result yet. Compare a new practice score with 0.25 before claiming a placement improvement. Current validation is saved in reports/defensive-combat/ and reports/defensive-combat-vm/.

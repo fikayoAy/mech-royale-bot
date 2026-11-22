@@ -1,0 +1,54 @@
+{
+  "level": 3,
+  "name": "Tactical pressure",
+  "runs": [
+    {
+      "level": 3,
+      "name": "Tactical pressure",
+      "seed": 17,
+      "actions": 160,
+      "invalid_actions": 0,
+      "missed_ticks": 0,
+      "exceptions": [],
+      "latency_ms": {
+        "median": 0.143175,
+        "p95": 0.30772,
+        "p99": 0.7445,
+        "max": 0.79565
+      },
+      "late_actions": 0,
+      "peak_python_bytes": 160768,
+      "process_peak_rss_bytes": 19685376,
+      "memory_note": "process lifetime peak; allocation sample is separate from latency",
+      "safety_rule_violations": [],
+      "assertion_failures": [],
+      "timing_failures": [],
+      "map": null,
+      "note": "Synthetic/recorded implementation checks only; no gameplay or placement result. Official Docker checker is a separate gate."
+    },
+    {
+      "level": 3,
+      "name": "Tactical pressure",
+      "seed": 29,
+      "actions": 160,
+      "invalid_actions": 0,
+      "missed_ticks": 0,
+      "exceptions": [],
+      "latency_ms": {
+        "median": 0.142675,
+        "p95": 0.29665,
+        "p99": 0.74237,
+        "max": 0.82723
+      },
+      "late_actions": 0,
+      "peak_python_bytes": 160616,
+      "process_peak_rss_bytes": 64667648,
+      "memory_note": "process lifetime peak; allocation sample is separate from latency",
+      "safety_rule_violations": [],
+      "assertion_failures": [],
+      "timing_failures": [],
+      "map": null,
+      "note": "Synthetic/recorded implementation checks only; no gameplay or placement result. Official Docker checker is a separate gate."
+    }
+  ]
+}

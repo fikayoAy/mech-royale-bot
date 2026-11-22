@@ -96,8 +96,12 @@ class Bot:
             weakness=1-clamp(hp/max(1,mh or 1400),0,1) if isinstance(hp,(int,float)) else .25
             crowd=sum(1 for y in choices if y is not x and dist(y[1],q)<70)
             return confidence*(1+weakness*.35)/(1+dist(p,q)/90+crowd*.7)
-        best=max(choices,key=score)
-        held=next((x for x in choices if x[0].get('id')==self.target_id),None)
+        # Current sensor reports take priority over our own extrapolated
+        # tracks, so a remembered opponent cannot prevent a real defensive shot.
+        sensed=[x for x in choices if not x[0].get('inferred')]
+        pool=sensed or choices
+        best=max(pool,key=score)
+        held=next((x for x in pool if x[0].get('id')==self.target_id),None)
         if held and now<self.target_until and score(held)>=score(best)*.8:best=held
         if best[0].get('id')!=self.target_id:self.target_until=now+1.
         self.target_id=best[0].get('id')
@@ -180,7 +184,7 @@ class Bot:
         self.current_goal=list(goal)
         waypoint=self.nav.waypoint(p,goal,self.risk,now,revision=self.world.revision)
         desired=[waypoint[0]-p[0],waypoint[1]-p[1]]
-        if math.hypot(*desired)<.1 and self.nav.status in ('no_route','no_anchor'):
+        if math.hypot(*desired)<.1 and dist(p,goal)>3 and self.nav.status in ('searching','refining','no_route','no_anchor'):
             desired=[goal[0]-p[0],goal[1]-p[1]]
         if target and not urgent and not danger and not weak and not target[0].get('inferred') and dist(p,target[1])<110:
             q=target[1];away=[p[0]-q[0],p[1]-q[1]];n=max(1.,math.hypot(*away))

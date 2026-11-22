@@ -47,7 +47,10 @@ def aim_and_fire(bot,o,p,target,unsafe):
     origin=[p[0],p[1],p[2]+stats['muzzle_height']]
     ws=me.get('weapons',[]);options=[]
     for slot,w in enumerate(ws[:2]):
-        if not isinstance(w,dict) or w.get('cooldown',0)>.05:continue
+        if not isinstance(w,dict):continue
+        if w.get('kind')!='gun' and w.get('cooldown',0)>.05:continue
+        # Holding the gun trigger through cooldown lets the server fire at its
+        # actual ready tick; dropping it here needlessly reduced firing cadence.
         kind=w.get('kind');st=dict(bot.config.get('weapons',{}).get(kind,{}));st.update(w.get('stats',{}))
         distance=math.dist(origin,center);pitch=None;flight=None
         if kind=='gun':
@@ -57,9 +60,13 @@ def aim_and_fire(bot,o,p,target,unsafe):
             if distance>st.get('range',45.) or me.get('energy',0)<st.get('energy',3.)+12:continue
             point=center;priority=4
         elif kind=='laser':
+            # Beginning a charge halves movement speed. Preserve the escape;
+            # an existing charge may still be released at a clear aligned target.
+            if unsafe and w.get('charge',0.)<=0:continue
             if distance>st.get('range',280.):continue
             point=center;priority=2
         elif kind=='mortar':
+            if unsafe:continue
             # No guess at a blind target; avoid self splash and unusable arcs.
             if distance<st.get('splash_radius',7.)*3:continue
             solution=mortar([p[0],p[1],p[2]+stats['height']+.5],center,velocity,st.get('speed',72.),st.get('gravity',22.))
@@ -74,15 +81,24 @@ def aim_and_fire(bot,o,p,target,unsafe):
         _,_,_,_,_,yaw,pitch,_=max(options,key=lambda x:x[0]);aim=[yaw,pitch]
     else:aim=[math.atan2(center[1]-origin[1],center[0]-origin[0]),math.atan2(center[2]-origin[2],max(1.,math.dist(origin[:2],center[:2])))]
     aim=[max(-math.pi,min(math.pi,aim[0])),max(stats['min_pitch'],min(stats['max_pitch'],aim[1]))]
-    if unsafe or actor.get('inferred') or confidence<.99:return aim,fire
-    # An actor can remain in official sensor memory behind a wall or canopy.
-    eye=[p[0],p[1],p[2]+stats['eye_height']]
-    if bot.arena.visibility(eye,center,bot.config.get('vision',{}).get('near_range',45.)+stats.get('near_range_bonus',0.),bot.config.get('vision',{}).get('canopy_blocks',True))<bot.arena.rules.get('canopyBlockT',.25):return aim,fire
-    for _,slot,w,st,point,yaw,pitch,flight in options:
+    # Legs and torso are independent. A gun shot does not slow a dodge or
+    # retreat; blanket suppression here previously disabled self-defense.
+    if actor.get('inferred') or confidence<.99:return aim,fire
+    # Aim validity is cheap. Only cast expensive terrain/tree rays when a
+    # weapon could actually fire along the current torso direction.
+    aligned_options=[]
+    for option in options:
+        _,slot,w,st,point,yaw,pitch,flight=option
         distance=max(1.,math.dist(origin,point))
         tolerance=max(.015,min(.12,math.atan2(bot.config.get('mech',{}).get('radius',2.5)*scale*.8,distance)))
         if w['kind']=='lightning':tolerance=math.radians(st.get('cone_deg',30.))/2
-        aligned=abs(_angle(yaw,current[0]))<tolerance and abs(pitch-current[1])<max(tolerance,.04)
+        if abs(_angle(yaw,current[0]))<tolerance and abs(pitch-current[1])<max(tolerance,.04):aligned_options.append(option)
+    if not aligned_options:return aim,fire
+    # An actor can remain in official sensor memory behind a wall or canopy.
+    eye=[p[0],p[1],p[2]+stats['eye_height']]
+    if bot.arena.visibility(eye,center,bot.config.get('vision',{}).get('near_range',45.)+stats.get('near_range_bonus',0.),bot.config.get('vision',{}).get('canopy_blocks',True))<bot.arena.rules.get('canopyBlockT',.25):return aim,fire
+    for _,slot,w,st,point,yaw,pitch,flight in aligned_options:
+        aligned=True
         if w['kind']=='mortar':
             if not aligned:continue
             start=[p[0],p[1],p[2]+stats['height']+.5];previous=start
@@ -98,6 +114,6 @@ def aim_and_fire(bot,o,p,target,unsafe):
             if w['kind']=='laser':
                 # True charges; false releases. The old policy never began a charge.
                 charge=w.get('charge',0.)
-                fire[slot]=aligned and charge<st.get('charge',.75)
+                fire[slot]=aligned and charge<st.get('charge',.75) and not unsafe
             elif aligned:fire[slot]=True
     return aim,fire

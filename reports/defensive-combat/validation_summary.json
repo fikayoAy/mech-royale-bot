@@ -1,0 +1,71 @@
+{
+  "captured_utc": "2026-11-22T04:02:55.267222+00:00",
+  "state": "validated_local_fix_not_rescored",
+  "based_on_submitted_commit": "38c5e47a7505",
+  "reported_practice_score_for_base": 0.25,
+  "new_version_practice_score": null,
+  "unit_tests": {
+    "passed": 48,
+    "failures": 0
+  },
+  "checks": {
+    "workstation": {
+      "passed": true,
+      "levels": 5,
+      "seeds": [
+        17,
+        29
+      ],
+      "actions": 4120,
+      "max_p99_ms": 8.0973
+    },
+    "vm_native_arm64": {
+      "passed": true,
+      "levels": 5,
+      "seeds": [
+        17,
+        29
+      ],
+      "actions": 4120,
+      "max_p99_ms": 5.50793
+    },
+    "official_vm_native": {
+      "passed": true,
+      "p99_ms": 2.3,
+      "answered_on_time": 300,
+      "late": 0,
+      "observations": 300
+    },
+    "official_docker_amd64_emulated": {
+      "passed": true,
+      "p99_ms": 50.8,
+      "answered_on_time": 296,
+      "late": 4,
+      "observations": 300,
+      "note": "AMD64 emulation on ARM64; native AMD64 action timings are unmeasured."
+    }
+  },
+  "sandbox_peak_rss_bytes": 69414912,
+  "vm_source_matches_workspace": true,
+  "source_sha256": {
+    "bot.py": "b189ded478987e353f5851b55c960ecca50023e77fc2487c44058fe6115612f3",
+    "arena_map.py": "007d0a2b7f2e9f005791324d5803b24e13e48818202d2b0912404d4e81db0f50",
+    "navigation.py": "30209c711350c5e25396b4bd62885ab17cd3d9da5369225d8f9f61e3e350464d",
+    "combat.py": "245f9cf500f1673ff5f8ed92f090f76714ea1de37af0e928874c09c5b632d00b",
+    "mechfight.py": "30c072b32bf945e6406913024b814286f3344b1a0ba29768a07e5ff13ae2873d",
+    "virtual_map.py": "c2b6de32510bf1385e00dc85dd580380a2c10aa09a3e58aef4140e56021f0553",
+    "Dockerfile": "42eba27ec584caebe6de42700fc5bc66c68b696fc7a1b6098f3a60d6f40b0cba"
+  },
+  "changes": [
+    "Gun self-defense allowed during dodges, low-health retreat and zone movement.",
+    "Hold gun trigger through cooldown when aim/range/visibility are valid.",
+    "Prioritize current sensor targets over extrapolated tracks.",
+    "Keep collision-checked local movement while a route is being calculated.",
+    "Only compute expensive shot visibility after alignment checks."
+  ],
+  "limitations": [
+    "No replay or per-match trace was available to identify the causes of each death.",
+    "Synthetic and recorded checks do not measure placement improvement.",
+    "A new scored submission is required."
+  ]
+}
