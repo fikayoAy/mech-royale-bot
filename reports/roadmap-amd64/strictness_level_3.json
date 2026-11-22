@@ -1,0 +1,336 @@
+{
+  "level": 3,
+  "name": "Tactical pressure",
+  "runs": [
+    {
+      "level": 3,
+      "name": "Tactical pressure",
+      "seed": 17,
+      "actions": 160,
+      "invalid_actions": 0,
+      "missed_ticks": 0,
+      "exceptions": [],
+      "latency_ms": {
+        "median": 1.316683,
+        "p95": 3.828187,
+        "p99": 4.271444,
+        "max": 4.408952
+      },
+      "late_actions": 0,
+      "peak_python_bytes": 385552,
+      "process_peak_rss_bytes": 67104768,
+      "memory_note": "process lifetime peak; allocation sample is separate from latency",
+      "safety_rule_violations": [],
+      "assertion_failures": [],
+      "timing_failures": [],
+      "behavior_checks": [
+        {
+          "scenario": "weak mech boosts away from pursuit",
+          "passed": true
+        },
+        {
+          "scenario": "pursuit boost stops before empty tank",
+          "passed": true
+        },
+        {
+          "scenario": "health recovery persists above weak threshold",
+          "passed": true
+        },
+        {
+          "scenario": "health recovery exits after healing",
+          "passed": true
+        },
+        {
+          "scenario": "quiet low magazine reloads early",
+          "passed": true
+        },
+        {
+          "scenario": "zone escape overrides pickup",
+          "passed": true
+        }
+      ],
+      "synthetic_match_seconds": 15.9,
+      "initial_spawn": null,
+      "policy": {
+        "name": "survival",
+        "weak_enter": 0.42,
+        "recovery_exit": 0.72,
+        "danger_enter": 0.9,
+        "danger_exit": 0.55,
+        "engage_advantage": 1.15,
+        "mode_hold_s": 0.8,
+        "target_hold_s": 1.0,
+        "target_switch_ratio": 0.8,
+        "goal_hold_s": 2.0,
+        "goal_risk_weight": 65.0,
+        "support_radius": 70.0,
+        "support_weight": 0.55,
+        "behavior_half_life_s": 12.0,
+        "encounter_gap_s": 6.0,
+        "boost_start_fraction": 0.55,
+        "boost_stop_fraction": 0.25,
+        "escape_reserve": 8.0,
+        "pursuit_radius": 120.0,
+        "preferred_range": 70.0,
+        "reload_fraction": 0.4,
+        "loot_radius": 45.0,
+        "scan_period_s": 4.0,
+        "navigation_budget_ms": 0.6,
+        "decision_budget_ms": 35.0,
+        "heat_decay": 0.4,
+        "cover_rays": 4,
+        "max_tracks": 15,
+        "max_heat_cells": 256,
+        "max_encounters_kept": 16
+      },
+      "mode_transitions": 27,
+      "telemetry": {
+        "schema": "mech-match-summary/1",
+        "actions": 160,
+        "errors": 0,
+        "mode_counts": {
+          "evade": 121,
+          "engage": 39
+        },
+        "decision_ms": {
+          "p50_recent": 1.30272999990666,
+          "p95_recent": 3.812402999983533,
+          "p99_recent": 4.250226000067414,
+          "max": 4.391446999989057,
+          "late": 0
+        },
+        "stuck_seconds": 15.9,
+        "zone_seconds": 0.0,
+        "zone_damage": 0.0,
+        "weapon_damage_received": 0.0,
+        "damage_dealt": 0.0,
+        "ammo_spent": 0,
+        "firing_actions": 0,
+        "budget_fallbacks": 0,
+        "policy": {
+          "name": "survival",
+          "weak_enter": 0.42,
+          "recovery_exit": 0.72,
+          "danger_enter": 0.9,
+          "danger_exit": 0.55,
+          "engage_advantage": 1.15,
+          "mode_hold_s": 0.8,
+          "target_hold_s": 1.0,
+          "target_switch_ratio": 0.8,
+          "goal_hold_s": 2.0,
+          "goal_risk_weight": 65.0,
+          "support_radius": 70.0,
+          "support_weight": 0.55,
+          "behavior_half_life_s": 12.0,
+          "encounter_gap_s": 6.0,
+          "boost_start_fraction": 0.55,
+          "boost_stop_fraction": 0.25,
+          "escape_reserve": 8.0,
+          "pursuit_radius": 120.0,
+          "preferred_range": 70.0,
+          "reload_fraction": 0.4,
+          "loot_radius": 45.0,
+          "scan_period_s": 4.0,
+          "navigation_budget_ms": 0.6,
+          "decision_budget_ms": 35.0,
+          "heat_decay": 0.4,
+          "cover_rays": 4,
+          "max_tracks": 15,
+          "max_heat_cells": 256,
+          "max_encounters_kept": 16
+        },
+        "encounters": {
+          "closed": 0,
+          "kills": 0,
+          "contacts_escaped": 0,
+          "eliminated_after_contact": 0,
+          "damage_dealt": 0.0,
+          "damage_received": 0.0,
+          "active": 3,
+          "recent": [],
+          "escape_definition": "No sensed or attributed contact for the configured gap while still alive; not proof the enemy stopped chasing.",
+          "loss_definition": "Non-winning end while contact remained active; does not identify who killed us."
+        },
+        "prediction_metrics": {
+          "prediction_samples": 477,
+          "prediction_error_sum": 47.69999999999955,
+          "stuck_replans": 31,
+          "map_updates": 160,
+          "projectile_threats": 40,
+          "cover_queries": 640
+        },
+        "end": null,
+        "latency_sample_cap": 1024,
+        "score_source": "end message; recorded fixtures are not genuine match results",
+        "score": null
+      },
+      "map": null,
+      "note": "Synthetic/recorded implementation checks only; no gameplay or placement result. Official Docker checker is a separate gate."
+    },
+    {
+      "level": 3,
+      "name": "Tactical pressure",
+      "seed": 29,
+      "actions": 160,
+      "invalid_actions": 0,
+      "missed_ticks": 0,
+      "exceptions": [],
+      "latency_ms": {
+        "median": 1.3133154999999999,
+        "p95": 3.741297,
+        "p99": 4.337829,
+        "max": 4.694241
+      },
+      "late_actions": 0,
+      "peak_python_bytes": 385552,
+      "process_peak_rss_bytes": 73940992,
+      "memory_note": "process lifetime peak; allocation sample is separate from latency",
+      "safety_rule_violations": [],
+      "assertion_failures": [],
+      "timing_failures": [],
+      "behavior_checks": [
+        {
+          "scenario": "weak mech boosts away from pursuit",
+          "passed": true
+        },
+        {
+          "scenario": "pursuit boost stops before empty tank",
+          "passed": true
+        },
+        {
+          "scenario": "health recovery persists above weak threshold",
+          "passed": true
+        },
+        {
+          "scenario": "health recovery exits after healing",
+          "passed": true
+        },
+        {
+          "scenario": "quiet low magazine reloads early",
+          "passed": true
+        },
+        {
+          "scenario": "zone escape overrides pickup",
+          "passed": true
+        }
+      ],
+      "synthetic_match_seconds": 15.9,
+      "initial_spawn": null,
+      "policy": {
+        "name": "survival",
+        "weak_enter": 0.42,
+        "recovery_exit": 0.72,
+        "danger_enter": 0.9,
+        "danger_exit": 0.55,
+        "engage_advantage": 1.15,
+        "mode_hold_s": 0.8,
+        "target_hold_s": 1.0,
+        "target_switch_ratio": 0.8,
+        "goal_hold_s": 2.0,
+        "goal_risk_weight": 65.0,
+        "support_radius": 70.0,
+        "support_weight": 0.55,
+        "behavior_half_life_s": 12.0,
+        "encounter_gap_s": 6.0,
+        "boost_start_fraction": 0.55,
+        "boost_stop_fraction": 0.25,
+        "escape_reserve": 8.0,
+        "pursuit_radius": 120.0,
+        "preferred_range": 70.0,
+        "reload_fraction": 0.4,
+        "loot_radius": 45.0,
+        "scan_period_s": 4.0,
+        "navigation_budget_ms": 0.6,
+        "decision_budget_ms": 35.0,
+        "heat_decay": 0.4,
+        "cover_rays": 4,
+        "max_tracks": 15,
+        "max_heat_cells": 256,
+        "max_encounters_kept": 16
+      },
+      "mode_transitions": 27,
+      "telemetry": {
+        "schema": "mech-match-summary/1",
+        "actions": 160,
+        "errors": 0,
+        "mode_counts": {
+          "evade": 121,
+          "engage": 39
+        },
+        "decision_ms": {
+          "p50_recent": 1.3005390001126216,
+          "p95_recent": 3.724383999951897,
+          "p99_recent": 3.809330999956728,
+          "max": 4.67200100001719,
+          "late": 0
+        },
+        "stuck_seconds": 15.9,
+        "zone_seconds": 0.0,
+        "zone_damage": 0.0,
+        "weapon_damage_received": 0.0,
+        "damage_dealt": 0.0,
+        "ammo_spent": 0,
+        "firing_actions": 0,
+        "budget_fallbacks": 0,
+        "policy": {
+          "name": "survival",
+          "weak_enter": 0.42,
+          "recovery_exit": 0.72,
+          "danger_enter": 0.9,
+          "danger_exit": 0.55,
+          "engage_advantage": 1.15,
+          "mode_hold_s": 0.8,
+          "target_hold_s": 1.0,
+          "target_switch_ratio": 0.8,
+          "goal_hold_s": 2.0,
+          "goal_risk_weight": 65.0,
+          "support_radius": 70.0,
+          "support_weight": 0.55,
+          "behavior_half_life_s": 12.0,
+          "encounter_gap_s": 6.0,
+          "boost_start_fraction": 0.55,
+          "boost_stop_fraction": 0.25,
+          "escape_reserve": 8.0,
+          "pursuit_radius": 120.0,
+          "preferred_range": 70.0,
+          "reload_fraction": 0.4,
+          "loot_radius": 45.0,
+          "scan_period_s": 4.0,
+          "navigation_budget_ms": 0.6,
+          "decision_budget_ms": 35.0,
+          "heat_decay": 0.4,
+          "cover_rays": 4,
+          "max_tracks": 15,
+          "max_heat_cells": 256,
+          "max_encounters_kept": 16
+        },
+        "encounters": {
+          "closed": 0,
+          "kills": 0,
+          "contacts_escaped": 0,
+          "eliminated_after_contact": 0,
+          "damage_dealt": 0.0,
+          "damage_received": 0.0,
+          "active": 3,
+          "recent": [],
+          "escape_definition": "No sensed or attributed contact for the configured gap while still alive; not proof the enemy stopped chasing.",
+          "loss_definition": "Non-winning end while contact remained active; does not identify who killed us."
+        },
+        "prediction_metrics": {
+          "prediction_samples": 477,
+          "prediction_error_sum": 47.69999999999955,
+          "stuck_replans": 31,
+          "map_updates": 160,
+          "projectile_threats": 40,
+          "cover_queries": 640
+        },
+        "end": null,
+        "latency_sample_cap": 1024,
+        "score_source": "end message; recorded fixtures are not genuine match results",
+        "score": null
+      },
+      "map": null,
+      "note": "Synthetic/recorded implementation checks only; no gameplay or placement result. Official Docker checker is a separate gate."
+    }
+  ]
+}

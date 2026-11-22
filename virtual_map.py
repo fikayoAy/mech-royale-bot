@@ -82,14 +82,16 @@ class VirtualMap:
         self.heat[key]=(min(3.,self.heat.get(key,(0.,self.now))[0]+weight),self.now)
 
     def update(self,obs,stats):
+        policy=getattr(self,'policy',None)
         self.stats=stats
         self.now=float(obs.get('t',obs.get('tick',0)/20));self.tick=obs.get('tick',0)
         me=obs.get('self',{})
-        self.position=vector(me.get('pos'));self.velocity=vector(me.get('vel'));self.hp=max(1.,me.get('hp',1400.))
+        self.position=vector(me.get('pos'));self.velocity=vector(me.get('vel'));self.hp=max(0.,me.get('hp',1400.))
         self.zone=dict(obs.get('zone') or {})
-        self._risk_cache.clear();self._prediction_cache.clear();self._cover_cache.clear();self._rays_left=4
-        self.heat={k:(v[0]*math.exp(-max(0.,self.now-v[1])*.4),self.now) for k,v in self.heat.items()
-                   if v[0]*math.exp(-max(0.,self.now-v[1])*.4)>.03}
+        self._risk_cache.clear();self._prediction_cache.clear();self._cover_cache.clear();self._rays_left=policy.cover_rays if policy else 4
+        decay=policy.heat_decay if policy else .4
+        self.heat={k:(v[0]*math.exp(-max(0.,self.now-v[1])*decay),self.now) for k,v in self.heat.items()
+                   if v[0]*math.exp(-max(0.,self.now-v[1])*decay)>.03}
         sensed=set()
         for actor in objects(obs,'mechs'):
             eid=actor.get('id');kind=actor.get('kind','mech')
@@ -97,15 +99,12 @@ class VirtualMap:
             if kind=='mech' and not 0<=eid<16:continue
             memory=self.npcs if kind=='npc' else self.tracks;sensed.add((kind,eid))
             old=memory.get(eid);p,v=vector(actor.get('pos')),vector(actor.get('vel'))
-            ag=old['aggression'] if old else .5;evidence=old.get('evidence',0) if old else 0
+            ag=old['aggression'] if old else None;evidence=old.get('evidence',0) if old else 0
             if old:
                 dt=self.now-old['seen']
                 if .01<dt<2:
                     err=distance(p,[old['pos'][j]+old['vel'][j]*dt for j in range(3)])
                     self.metrics['prediction_samples']+=1;self.metrics['prediction_error_sum']+=err
-                    closing=(self.position[0]-p[0])*v[0]+(self.position[1]-p[1])*v[1]
-                    if distance(p,self.position)<120 and closing>distance(p,self.position)*2:ag=ag*.92+.08;evidence+=1
-                    else:ag=ag*.98+.5*.02
             memory[eid]={'id':eid,'kind':kind,'pos':p,'vel':v,'seen':self.now,'hp':actor.get('hp'),
                          'max_hp':actor.get('max_hp'),'weapons':actor.get('weapons',[]),'aim':vector(actor.get('aim'),2),
                          'charging':bool(actor.get('charging')),'aggression':ag,'evidence':evidence,
@@ -134,12 +133,21 @@ class VirtualMap:
             for q in beam.get('path',[])[:8]:self._heat_add(vector(q),.5)
         for ev in objects(obs,'events'):
             if ev.get('type')=='damaged':
+                if isinstance(ev.get('bearing'),(int,float)) and ev.get('weapon')!='zone':
+                    # Bearing-only damage adds a broad activity area, never an ID.
+                    for offset in (-noise,0.,noise):
+                        for reach in (30.,70.,130.):
+                            angle=ev['bearing']+offset
+                            self._heat_add([self.position[0]+math.cos(angle)*reach,self.position[1]+math.sin(angle)*reach],.12)
                 for memory in (self.tracks,self.npcs):
                     if ev.get('by') in memory:
-                        t=memory[ev['by']];t['aggression']=min(1.,t['aggression']+.2);t['damaged_us']=self.now;t['evidence']+=2
+                        t=memory[ev['by']];t['aggression']=1.;t['damaged_us']=self.now;t['evidence']+=1
             if ev.get('type')=='kill':self.tracks.pop(ev.get('target'),None)
             if ev.get('type')=='took':self.resources.pop(('pickups',ev.get('id')),None)
-        if len(self.heat)>256:self.heat=dict(sorted(self.heat.items(),key=lambda x:x[1][0],reverse=True)[:256])
+        cap=policy.max_heat_cells if policy else 256
+        if len(self.heat)>cap:self.heat=dict(sorted(self.heat.items(),key=lambda x:x[1][0],reverse=True)[:cap])
+        if policy and len(self.tracks)>policy.max_tracks:
+            self.tracks=dict(sorted(self.tracks.items(),key=lambda x:x[1]['seen'],reverse=True)[:policy.max_tracks])
         self.predictions=[]
         for eid,t in self.tracks.items():
             q,c,u=self.predict(t,self.now)
@@ -205,7 +213,12 @@ class VirtualMap:
             # Nearby possibilities carry most of the exposure calculation.
             for branch in self._branches[eid]:
                 bp=branch['pos'];d=max(0.,distance(q,bp)-uncertainty)
-                strength=confidence*branch['weight']*(.45+t['aggression']*.5)/(1+(d/45.)**2)
+                aggression=t.get('aggression');aggression=.5 if aggression is None else aggression
+                behavior=t.get('behavior',{})
+                strength=confidence*branch['weight']*(.45+aggression*.5)*behavior.get('threat_multiplier',1.)/(1+(d/45.)**2)
+                # Tendencies only adjust uncertainty-weighted exposure modestly;
+                # a quiet history never cancels an immediate projectile threat.
+                strength*=1+behavior.get('confidence',0.)*(.15*(behavior.get('chase') or 0.)+.15*(behavior.get('ambush') or 0.))
                 if strength<.025:continue
                 source=[bp[0],bp[1],bp[2]+self.config.get('mech',{}).get('muzzle_height',7.)]
                 values['enemies']+=strength*(self._exposure(source,target) if d<140. else 1.)

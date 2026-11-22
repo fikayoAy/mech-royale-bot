@@ -19,7 +19,7 @@ def main():
             'map':arena.summary(),'solid_kinds':{kind:sum(x['kind']==kind for x in arena.obstacles) for kind in ('building','bridge','stadium')},
             'prisms_with_holes':sum(bool(x['holes']) for x in arena.obstacles),
             'source_sha256':{name:hashlib.sha256((ROOT/name).read_bytes()).hexdigest() for name in
-                             ('bot.py','arena_map.py','navigation.py','combat.py','mechfight.py','virtual_map.py','Dockerfile')},
+                             [p.name for p in sorted(ROOT.glob('*.py'))]+['Dockerfile']},
             'kit_sha256':hashlib.sha256((ROOT/'work/mechfight-kit.tar.gz').read_bytes()).hexdigest() if (ROOT/'work/mechfight-kit.tar.gz').exists() else None,
             'virtual_map_layers':['sensed actors','inferred movement branches','NPCs','activity evidence','resources','zone forecasts','swept projectile threats','cover-aware route cost'],
             'notes':['All world.json sections retained in ArenaMap.world.',

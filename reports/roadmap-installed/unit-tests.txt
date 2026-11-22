@@ -1,0 +1,69 @@
+test_current_sensor_target_beats_own_inferred_target (test_defensive_combat.DefensiveCombatTests.test_current_sensor_target_beats_own_inferred_target) ... ok
+test_fire_while_dodging_fast_bullet (test_defensive_combat.DefensiveCombatTests.test_fire_while_dodging_fast_bullet) ... ok
+test_gun_trigger_stays_held_during_cooldown (test_defensive_combat.DefensiveCombatTests.test_gun_trigger_stays_held_during_cooldown) ... ok
+test_lightning_preserves_escape_energy (test_defensive_combat.DefensiveCombatTests.test_lightning_preserves_escape_energy) ... ok
+test_low_hp_retreat_can_return_fire (test_defensive_combat.DefensiveCombatTests.test_low_hp_retreat_can_return_fire) ... ok
+test_no_defensive_fire_at_only_inferred_target (test_defensive_combat.DefensiveCombatTests.test_no_defensive_fire_at_only_inferred_target) ... ok
+test_outside_zone_moves_inward_while_firing (test_defensive_combat.DefensiveCombatTests.test_outside_zone_moves_inward_while_firing) ... ok
+test_pressure_does_not_begin_slow_laser_charge (test_defensive_combat.DefensiveCombatTests.test_pressure_does_not_begin_slow_laser_charge) ... ok
+test_pressure_does_not_start_mortar_attack (test_defensive_combat.DefensiveCombatTests.test_pressure_does_not_start_mortar_attack) ... ok
+test_air_steering_respects_inertia_and_wall (test_navigation.MapTests.test_air_steering_respects_inertia_and_wall) ... ok
+test_airborne_sweep_and_live_canopy_switch (test_navigation.MapTests.test_airborne_sweep_and_live_canopy_switch) ... ok
+test_bilinear_signed_centimeters_and_y_axis (test_navigation.MapTests.test_bilinear_signed_centimeters_and_y_axis) ... ok
+test_bridge_underpass_and_scaled_mech_clearance (test_navigation.MapTests.test_bridge_underpass_and_scaled_mech_clearance) ... ok
+test_courtyard_holes_and_cylinder_radius (test_navigation.MapTests.test_courtyard_holes_and_cylinder_radius) ... ok
+test_dodge_and_strafe_cannot_bypass_clearance (test_navigation.MapTests.test_dodge_and_strafe_cannot_bypass_clearance) ... ok
+test_jet_energy_and_overhang (test_navigation.MapTests.test_jet_energy_and_overhang) ... ok
+test_official_full_map_loaded (test_navigation.MapTests.test_official_full_map_loaded) ... ok
+test_roof_drop_and_map_boundary (test_navigation.MapTests.test_roof_drop_and_map_boundary) ... ok
+test_route_around_multiple_obstacles (test_navigation.MapTests.test_route_around_multiple_obstacles) ... ok
+test_slope_uses_live_rule (test_navigation.MapTests.test_slope_uses_live_rule) ... ok
+test_trees_only_affect_vision_and_scenery_is_not_solid (test_navigation.MapTests.test_trees_only_affect_vision_and_scenery_is_not_solid) ... ok
+test_gun_lead_is_applied_once (test_navigation.PolicyTests.test_gun_lead_is_applied_once) ... ok
+test_laser_charges_then_releases (test_navigation.PolicyTests.test_laser_charges_then_releases) ... ok
+test_npc_danger_changes_movement_without_inventing_home (test_navigation.PolicyTests.test_npc_danger_changes_movement_without_inventing_home) ... ok
+test_prediction_stops_at_wall_and_uncertainty_grows (test_navigation.PolicyTests.test_prediction_stops_at_wall_and_uncertainty_grows) ... Map unavailable: FileNotFoundError
+ok
+test_schema_valid_fixture_and_action (test_navigation.PolicyTests.test_schema_valid_fixture_and_action) ... ok
+test_unknown_optional_fields_and_no_hidden_tracks (test_navigation.PolicyTests.test_unknown_optional_fields_and_no_hidden_tracks) ... ok
+test_wall_blocks_firing_at_official_memory_actor (test_navigation.PolicyTests.test_wall_blocks_firing_at_official_memory_actor) ... Map unavailable: FileNotFoundError
+ok
+test_zone_overrides_loot_while_retreating (test_navigation.PolicyTests.test_zone_overrides_loot_while_retreating) ... ok
+test_all_named_behavior_scenarios (test_roadmap.RoadmapTests.test_all_named_behavior_scenarios) ... ok
+test_defeat_after_contact_has_no_false_killer_claim (test_roadmap.RoadmapTests.test_defeat_after_contact_has_no_false_killer_claim) ... ok
+test_direction_and_outcome_evidence (test_roadmap.RoadmapTests.test_direction_and_outcome_evidence) ... ok
+test_match_summary_score_and_zone_damage (test_roadmap.RoadmapTests.test_match_summary_score_and_zone_damage) ... ok
+test_missing_damage_identity_never_creates_track (test_roadmap.RoadmapTests.test_missing_damage_identity_never_creates_track) ... ok
+test_policy_bounds_reject_invalid_values (test_roadmap.RoadmapTests.test_policy_bounds_reject_invalid_values) ... ok
+test_policy_is_independent_of_test_level (test_roadmap.RoadmapTests.test_policy_is_independent_of_test_level) ... ok
+test_protocol_handshake_action_end_summary (test_roadmap.RoadmapTests.test_protocol_handshake_action_end_summary) ... ok
+test_protocol_uses_custom_fallback_after_error (test_roadmap.RoadmapTests.test_protocol_uses_custom_fallback_after_error) ... ok
+test_recovery_mode_holds_until_health_restored (test_roadmap.RoadmapTests.test_recovery_mode_holds_until_health_restored) ... ok
+test_safe_weapon_swap_and_charging_rejection (test_roadmap.RoadmapTests.test_safe_weapon_swap_and_charging_rejection) ... ok
+test_telemetry_rejects_writes_outside_tmp (test_roadmap.RoadmapTests.test_telemetry_rejects_writes_outside_tmp) ... ok
+test_upgrade_uses_actual_config_effects (test_roadmap.RoadmapTests.test_upgrade_uses_actual_config_effects) ... Map unavailable: FileNotFoundError
+ok
+test_cached_route_replans_when_threat_changes (test_virtual_map.LiveRouteTests.test_cached_route_replans_when_threat_changes) ... ok
+test_direct_path_respects_destination_height (test_virtual_map.LiveRouteTests.test_direct_path_respects_destination_height) ... ok
+test_finer_grid_retry_preserves_collision_checks (test_virtual_map.LiveRouteTests.test_finer_grid_retry_preserves_collision_checks) ... ok
+test_short_direct_route_does_not_ignore_danger (test_virtual_map.LiveRouteTests.test_short_direct_route_does_not_ignore_danger) ... ok
+test_bot_uses_one_shared_model (test_virtual_map.VirtualMapTests.test_bot_uses_one_shared_model) ... ok
+test_confidence_and_multiple_map_checked_hypotheses (test_virtual_map.VirtualMapTests.test_confidence_and_multiple_map_checked_hypotheses) ... ok
+test_cover_reduces_weapon_risk_without_erasing_threat (test_virtual_map.VirtualMapTests.test_cover_reduces_weapon_risk_without_erasing_threat) ... ok
+test_debug_draw_obeys_schema_and_caps (test_virtual_map.VirtualMapTests.test_debug_draw_obeys_schema_and_caps) ... ok
+test_exhausted_cover_budget_is_conservative (test_virtual_map.VirtualMapTests.test_exhausted_cover_budget_is_conservative) ... ok
+test_fast_bullet_behind_cover_and_high_bullet (test_virtual_map.VirtualMapTests.test_fast_bullet_behind_cover_and_high_bullet) ... ok
+test_fast_bullet_between_old_samples (test_virtual_map.VirtualMapTests.test_fast_bullet_between_old_samples) ... ok
+test_live_memory_setting_and_expiry (test_virtual_map.VirtualMapTests.test_live_memory_setting_and_expiry) ... ok
+test_memory_caps_under_large_inputs (test_virtual_map.VirtualMapTests.test_memory_caps_under_large_inputs) ... ok
+test_prediction_branches_stay_out_of_wall (test_virtual_map.VirtualMapTests.test_prediction_branches_stay_out_of_wall) ... ok
+test_resource_memory_is_labeled_and_expires (test_virtual_map.VirtualMapTests.test_resource_memory_is_labeled_and_expires) ... ok
+test_snapshot_does_not_change_when_memory_or_route_changes (test_virtual_map.VirtualMapTests.test_snapshot_does_not_change_when_memory_or_route_changes) ... ok
+test_sound_is_area_evidence_without_fake_actor (test_virtual_map.VirtualMapTests.test_sound_is_area_evidence_without_fake_actor) ... ok
+test_vertical_projectile_and_moving_self (test_virtual_map.VirtualMapTests.test_vertical_projectile_and_moving_self) ... ok
+test_zone_forecast_and_arrival_risk (test_virtual_map.VirtualMapTests.test_zone_forecast_and_arrival_risk) ... ok
+
+----------------------------------------------------------------------
+Ran 61 tests in 0.256s
+
+OK

@@ -1,0 +1,64 @@
+{
+  "captured_utc": "2026-11-22T04:53:48.682237+00:00",
+  "host_architecture": "aarch64",
+  "map": {
+    "prisms": 259,
+    "trees": 1560,
+    "terrain_samples": 774680,
+    "bounds": {
+      "minX": -512.38,
+      "maxX": 555.08,
+      "minY": -333.09,
+      "maxY": 388.64
+    },
+    "load_error": null,
+    "scenery_sections": [
+      "blocks",
+      "stadium",
+      "cars",
+      "parking",
+      "water",
+      "barriers",
+      "stats"
+    ]
+  },
+  "solid_kinds": {
+    "building": 223,
+    "bridge": 9,
+    "stadium": 27
+  },
+  "prisms_with_holes": 59,
+  "source_sha256": {
+    "arena_map.py": "c3173bf66b69d92834a8b726e2a6f9664a1dc5b4b0c65c27a915b87bf07ba60f",
+    "behavior_profiler.py": "588a9e219a1b38486b13b49ed74f8b30f332cd61b04ecb6bfd95dc99f79b9401",
+    "bot.py": "901654d064c0924565b76e905055121157b2de27c341e8a987853af24a812d0e",
+    "combat.py": "08701c6768ae71f3fa2396caea5ac16da419dfb33f3e70f23b30ad489cd6096a",
+    "config.py": "2cbe6c08c0bf4ceb435ccf885d5926fc43e1bb0a0cd01b92ee4f670a8ce894e2",
+    "decision_engine.py": "c54797d75364a3ff78c34cdf50b5fed68eb68c311194f704ed9789bcb6386cb3",
+    "encounters.py": "8eeeaf8a5acf2b3862a1b68b44f71a67890e45492c00828ee6eca4d2f6389ec9",
+    "mechfight.py": "3eda81e55bd4009ebb568677dfc6ee1033c834b6266f84f797238c8cad511098",
+    "navigation.py": "09104ecb8a7e2b12f74e8a7dba7b75911985afd42be5cc72298f11ab62a76543",
+    "survival.py": "b90b5aa3229638fe0af8f3f1e15ef2303064967c70bfda65bbb90eaeb570fa6f",
+    "target_selector.py": "ac55a381999dc295b2bfbfff8742e3b9a88fedb1392fc7198e1ce8de0228f096",
+    "telemetry.py": "4dc04e06ea3c1afb416f55d6cb204a3b527c076c34866637f08b62c9c049ca5c",
+    "virtual_map.py": "89279e0908789a7d826aa0ef2cce379b4801b4a672f7d440cce1f1b4e08f5ecc",
+    "Dockerfile": "f36f3b5dfd7e5ed8b10172ec842369b07eebfdc9befbc65f6b3e680cb39a83a5"
+  },
+  "kit_sha256": null,
+  "virtual_map_layers": [
+    "sensed actors",
+    "inferred movement branches",
+    "NPCs",
+    "activity evidence",
+    "resources",
+    "zone forecasts",
+    "swept projectile threats",
+    "cover-aware route cost"
+  ],
+  "notes": [
+    "All world.json sections retained in ArenaMap.world.",
+    "Only terrain and prisms block movement/shots. Trees affect vision.",
+    "Dynamic spawns, loot and NPC homes are not in the static map.",
+    "Routes, rays and jet checks approximate physics; the server is authoritative."
+  ]
+}

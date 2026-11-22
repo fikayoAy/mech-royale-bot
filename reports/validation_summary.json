@@ -1,71 +1,54 @@
 {
-  "captured_utc": "2026-11-22T04:02:55.267222+00:00",
-  "state": "validated_local_fix_not_rescored",
-  "based_on_submitted_commit": "38c5e47a7505",
-  "reported_practice_score_for_base": 0.25,
-  "new_version_practice_score": null,
-  "unit_tests": {
-    "passed": 48,
-    "failures": 0
+  "captured_utc": "2026-11-22T04:57:17.000004+00:00",
+  "release_gates_pass": true,
+  "gates": {
+    "all_five_levels": true,
+    "unit_tests": true,
+    "official_checker": true,
+    "runtime_source_hashes_match": true,
+    "repository_under_20_MB": true,
+    "build_under_10_minutes": true,
+    "memory_under_512_MiB": true
   },
-  "checks": {
-    "workstation": {
-      "passed": true,
-      "levels": 5,
-      "seeds": [
-        17,
-        29
-      ],
-      "actions": 4120,
-      "max_p99_ms": 8.0973
-    },
-    "vm_native_arm64": {
-      "passed": true,
-      "levels": 5,
-      "seeds": [
-        17,
-        29
-      ],
-      "actions": 4120,
-      "max_p99_ms": 5.50793
-    },
-    "official_vm_native": {
-      "passed": true,
-      "p99_ms": 2.3,
-      "answered_on_time": 300,
-      "late": 0,
-      "observations": 300
-    },
-    "official_docker_amd64_emulated": {
-      "passed": true,
-      "p99_ms": 50.8,
-      "answered_on_time": 296,
-      "late": 4,
-      "observations": 300,
-      "note": "AMD64 emulation on ARM64; native AMD64 action timings are unmeasured."
-    }
-  },
-  "sandbox_peak_rss_bytes": 69414912,
-  "vm_source_matches_workspace": true,
-  "source_sha256": {
-    "bot.py": "b189ded478987e353f5851b55c960ecca50023e77fc2487c44058fe6115612f3",
-    "arena_map.py": "007d0a2b7f2e9f005791324d5803b24e13e48818202d2b0912404d4e81db0f50",
-    "navigation.py": "30209c711350c5e25396b4bd62885ab17cd3d9da5369225d8f9f61e3e350464d",
-    "combat.py": "245f9cf500f1673ff5f8ed92f090f76714ea1de37af0e928874c09c5b632d00b",
-    "mechfight.py": "30c072b32bf945e6406913024b814286f3344b1a0ba29768a07e5ff13ae2873d",
-    "virtual_map.py": "c2b6de32510bf1385e00dc85dd580380a2c10aa09a3e58aef4140e56021f0553",
-    "Dockerfile": "42eba27ec584caebe6de42700fc5bc66c68b696fc7a1b6098f3a60d6f40b0cba"
-  },
-  "changes": [
-    "Gun self-defense allowed during dodges, low-health retreat and zone movement.",
-    "Hold gun trigger through cooldown when aim/range/visibility are valid.",
-    "Prioritize current sensor targets over extrapolated tracks.",
-    "Keep collision-checked local movement while a route is being calculated.",
-    "Only compute expensive shot visibility after alignment checks."
+  "host_architecture": "x86_64",
+  "uid": 65534,
+  "runtime_module": "/bot/bot.py",
+  "unit_tests": 61,
+  "strictness_levels": 5,
+  "seeds": [
+    17,
+    29
   ],
-  "limitations": [
-    "No replay or per-match trace was available to identify the causes of each death.",
-    "Synthetic and recorded checks do not measure placement improvement.",
-    "A new scored submission is required."
-  ]
+  "strictness_actions": 11382,
+  "strictness_late_actions": 0,
+  "worst_strictness_p99_ms": 14.053582,
+  "peak_stress_rss_bytes": 75673600,
+  "official_container_runs": 3,
+  "official_reports": [
+    "reports\\roadmap-amd64\\repeat-1\\official-docker-linux-amd64.json",
+    "reports\\roadmap-amd64\\repeat-2\\official-docker-linux-amd64.json",
+    "reports\\roadmap-amd64\\repeat-3\\official-docker-linux-amd64.json"
+  ],
+  "build_seconds": 2.409314009999889,
+  "tracked_tree_bytes": 1209526,
+  "runtime_sha256": {
+    "arena_map.py": "c3173bf66b69d92834a8b726e2a6f9664a1dc5b4b0c65c27a915b87bf07ba60f",
+    "behavior_profiler.py": "588a9e219a1b38486b13b49ed74f8b30f332cd61b04ecb6bfd95dc99f79b9401",
+    "bot.py": "901654d064c0924565b76e905055121157b2de27c341e8a987853af24a812d0e",
+    "combat.py": "08701c6768ae71f3fa2396caea5ac16da419dfb33f3e70f23b30ad489cd6096a",
+    "config.py": "2cbe6c08c0bf4ceb435ccf885d5926fc43e1bb0a0cd01b92ee4f670a8ce894e2",
+    "decision_engine.py": "c54797d75364a3ff78c34cdf50b5fed68eb68c311194f704ed9789bcb6386cb3",
+    "encounters.py": "8eeeaf8a5acf2b3862a1b68b44f71a67890e45492c00828ee6eca4d2f6389ec9",
+    "mechfight.py": "3eda81e55bd4009ebb568677dfc6ee1033c834b6266f84f797238c8cad511098",
+    "navigation.py": "09104ecb8a7e2b12f74e8a7dba7b75911985afd42be5cc72298f11ab62a76543",
+    "survival.py": "b90b5aa3229638fe0af8f3f1e15ef2303064967c70bfda65bbb90eaeb570fa6f",
+    "target_selector.py": "ac55a381999dc295b2bfbfff8742e3b9a88fedb1392fc7198e1ce8de0228f096",
+    "telemetry.py": "4dc04e06ea3c1afb416f55d6cb204a3b527c076c34866637f08b62c9c049ca5c",
+    "virtual_map.py": "89279e0908789a7d826aa0ef2cce379b4801b4a672f7d440cce1f1b4e08f5ecc"
+  },
+  "build_sha256": "f36f3b5dfd7e5ed8b10172ec842369b07eebfdc9befbc65f6b3e680cb39a83a5",
+  "sandbox": "1 CPU; 512 MiB; uid 65534; network none; read-only root and arena; /tmp 64 MiB",
+  "match_result_for_this_version": null,
+  "note": "Scripted and recorded inputs test implementation, not placement or victories.",
+  "official_kit_archive_sha256": "1758fe9125e193b268c6c1cffbf2c0ae96377214ab06d117412571c1523065ba"
 }

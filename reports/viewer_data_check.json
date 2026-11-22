@@ -1,0 +1,12 @@
+{
+  "passed": true,
+  "frames": 30,
+  "source_sha256": "270dce15ea669e59e8ac6f5eb6139ebbf46e54dda2c79a151c26aca79defb3cf",
+  "checked": "Regenerated embedded data and map counts; viewer controls are unchanged from prior browser QA.",
+  "modes": [
+    "evade",
+    "observe",
+    "reposition",
+    "zone_move"
+  ]
+}

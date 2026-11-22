@@ -1,0 +1,17 @@
+{
+  "command": [
+    "sudo",
+    "docker",
+    "build",
+    "--platform",
+    "linux/amd64",
+    "--no-cache",
+    "-t",
+    "mech-agent:roadmap",
+    "."
+  ],
+  "seconds": 7.4765517980000595,
+  "exit_code": 0,
+  "stdout": "Sending build context to Docker daemon  2.168MB\n\nStep 1/4 : FROM python:3.13-slim@sha256:e48f59cdba69a3cbd9ed2cf0f348d90d45a8d350d98134cf1070bc106ee9ed90\n3.13-slim: Pulling from library/python\nf7a79299dedd: Pulling fs layer\nfaa890a31e98: Pulling fs layer\n0069ea31add0: Pulling fs layer\n37fb86c2a767: Pulling fs layer\nf7a79299dedd: Download complete\n0069ea31add0: Download complete\nbd5f4d6ecf25: Download complete\n368efbfe1076: Download complete\nfaa890a31e98: Download complete\n37fb86c2a767: Download complete\n37fb86c2a767: Pull complete\n0069ea31add0: Pull complete\nf7a79299dedd: Pull complete\nfaa890a31e98: Pull complete\nDigest: sha256:e48f59cdba69a3cbd9ed2cf0f348d90d45a8d350d98134cf1070bc106ee9ed90\nStatus: Downloaded newer image for python:3.13-slim@sha256:e48f59cdba69a3cbd9ed2cf0f348d90d45a8d350d98134cf1070bc106ee9ed90\n ---> e48f59cdba69\nStep 2/4 : WORKDIR /bot\n ---> Running in 51089f966f95\n ---> Removed intermediate container 51089f966f95\n ---> 994847600b1e\nStep 3/4 : COPY bot.py mechfight.py arena_map.py navigation.py combat.py virtual_map.py config.py behavior_profiler.py encounters.py telemetry.py survival.py target_selector.py decision_engine.py ./\n ---> 3e67bf00d91c\nStep 4/4 : ENTRYPOINT [\"python3\", \"-u\", \"/bot/bot.py\"]\n ---> Running in 63676399a2e4\n ---> Removed intermediate container 63676399a2e4\n ---> 9c7c31b2a0e3\nSuccessfully built 9c7c31b2a0e3\nSuccessfully tagged mech-agent:roadmap\n",
+  "stderr": "DEPRECATED: The legacy builder is deprecated and will be removed in a future release.\n            Install the buildx component to build images with BuildKit:\n            https://docs.docker.com/go/buildx/\n\n"
+}

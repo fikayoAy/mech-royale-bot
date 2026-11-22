@@ -1,0 +1,19 @@
+{
+  "captured_utc": "2026-11-22T04:55:19.873215+00:00",
+  "host_system": "Windows-10-10.0.26200-SP0",
+  "host_architecture": "AMD64",
+  "python": "3.9.13",
+  "command": [
+    "C:\\Users\\ayode\\AppData\\Local\\Programs\\Python\\Python39\\python.exe",
+    "C:\\Users\\ayode\\machina\\mech-royale-upload-backup-20261122-030550\\work\\official-kit\\mechfight-kit\\check\\check.py",
+    "--",
+    "C:\\Users\\ayode\\AppData\\Local\\Programs\\Python\\Python39\\python.exe",
+    "-u",
+    "C:\\Users\\ayode\\machina\\mech-royale-merge\\bot.py"
+  ],
+  "exit_code": 0,
+  "elapsed_seconds": 0.7809999999990396,
+  "stdout": "bot: C:\\Users\\ayode\\AppData\\Local\\Programs\\Python\\Python39\\python.exe -u C:\\Users\\ayode\\machina\\mech-royale-merge\\bot.py\nready in 126 ms: name 'mech-royale-survivor'\nobservations: 300  answered in time: 300  missed the 50 ms budget: 0 (0 came late)\nanswer time ms: p50 1.5  p90 2.3  p99 3.6  max 6.6  (this machine, not the 1-CPU match container)\nanswers to older queued observations (dropped): 0  wrong tick: 0  bad lines: 0  debug drawings: 0 (0 over the caps)\nPASS\n",
+  "stderr": "{\"schema\":\"mech-match-summary/1\",\"actions\":300,\"errors\":0,\"mode_counts\":{\"observe\":49,\"reposition\":29,\"zone_move\":205,\"evade\":17},\"decision_ms\":{\"p50_recent\":1.0808999999999958,\"p95_recent\":2.1266999999999814,\"p99_recent\":2.9456999999999955,\"max\":6.172999999999984,\"late\":0},\"stuck_seconds\":0.1999999999999993,\"zone_seconds\":0.0,\"zone_damage\":0.0,\"weapon_damage_received\":1665.0,\"damage_dealt\":472.5,\"ammo_spent\":24,\"firing_actions\":7,\"budget_fallbacks\":0,\"prediction_metrics\":{\"prediction_samples\":166,\"prediction_error_sum\":43.68404427091176,\"stuck_replans\":0,\"map_updates\":300,\"projectile_threats\":19,\"cover_queries\":609},\"end\":{\"type\":\"end\",\"place\":13,\"kills\":0},\"latency_sample_cap\":1024,\"score_source\":\"end message; recorded fixtures are not genuine match results\",\"score\":3,\"encounters\":{\"closed\":1,\"kills\":0,\"contacts_escaped\":0,\"eliminated_after_contact\":1,\"damage_dealt\":472.5,\"damage_received\":1665.0,\"active\":0}}\n",
+  "note": "Conformance/timing on recorded observations. No match or placement result. AMD64 on an ARM host uses emulation."
+}

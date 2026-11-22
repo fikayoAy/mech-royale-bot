@@ -11,18 +11,163 @@
       "missed_ticks": 0,
       "exceptions": [],
       "latency_ms": {
-        "median": 2.8064999999999998,
-        "p95": 6.2415,
-        "p99": 7.6366,
-        "max": 16.2122
+        "median": 6.452187,
+        "p95": 11.315277,
+        "p99": 11.439487,
+        "max": 11.805081
       },
       "late_actions": 0,
-      "peak_python_bytes": 441564,
-      "process_peak_rss_bytes": 22618112,
+      "peak_python_bytes": 480192,
+      "process_peak_rss_bytes": 67104768,
       "memory_note": "process lifetime peak; allocation sample is separate from latency",
       "safety_rule_violations": [],
       "assertion_failures": [],
       "timing_failures": [],
+      "behavior_checks": [
+        {
+          "scenario": "coordinated support lowers fight advantage",
+          "passed": true
+        },
+        {
+          "scenario": "attributed stationary attack records ambush evidence",
+          "passed": true
+        },
+        {
+          "scenario": "new damage is evidence despite quiet history",
+          "passed": true
+        },
+        {
+          "scenario": "lost contact records an encounter outcome",
+          "passed": true
+        },
+        {
+          "scenario": "blocked escape replans repeatedly",
+          "passed": true
+        },
+        {
+          "scenario": "stuck recovery still checks solid clearance",
+          "passed": true
+        },
+        {
+          "scenario": "small information changes do not flip mode every tick",
+          "passed": true
+        }
+      ],
+      "synthetic_match_seconds": 19.900000000000002,
+      "initial_spawn": null,
+      "policy": {
+        "name": "survival",
+        "weak_enter": 0.42,
+        "recovery_exit": 0.72,
+        "danger_enter": 0.9,
+        "danger_exit": 0.55,
+        "engage_advantage": 1.15,
+        "mode_hold_s": 0.8,
+        "target_hold_s": 1.0,
+        "target_switch_ratio": 0.8,
+        "goal_hold_s": 2.0,
+        "goal_risk_weight": 65.0,
+        "support_radius": 70.0,
+        "support_weight": 0.55,
+        "behavior_half_life_s": 12.0,
+        "encounter_gap_s": 6.0,
+        "boost_start_fraction": 0.55,
+        "boost_stop_fraction": 0.25,
+        "escape_reserve": 8.0,
+        "pursuit_radius": 120.0,
+        "preferred_range": 70.0,
+        "reload_fraction": 0.4,
+        "loot_radius": 45.0,
+        "scan_period_s": 4.0,
+        "navigation_budget_ms": 0.6,
+        "decision_budget_ms": 35.0,
+        "heat_decay": 0.4,
+        "cover_rays": 4,
+        "max_tracks": 15,
+        "max_heat_cells": 256,
+        "max_encounters_kept": 16
+      },
+      "mode_transitions": 100,
+      "telemetry": {
+        "schema": "mech-match-summary/1",
+        "actions": 200,
+        "errors": 0,
+        "mode_counts": {
+          "evade": 50,
+          "disengage": 150
+        },
+        "decision_ms": {
+          "p50_recent": 6.431258000020534,
+          "p95_recent": 11.297165999849312,
+          "p99_recent": 11.4224970000123,
+          "max": 11.784824999949706,
+          "late": 0
+        },
+        "stuck_seconds": 19.9,
+        "zone_seconds": 0.0,
+        "zone_damage": 0.0,
+        "weapon_damage_received": 3600.0,
+        "damage_dealt": 0.0,
+        "ammo_spent": 0,
+        "firing_actions": 0,
+        "budget_fallbacks": 0,
+        "policy": {
+          "name": "survival",
+          "weak_enter": 0.42,
+          "recovery_exit": 0.72,
+          "danger_enter": 0.9,
+          "danger_exit": 0.55,
+          "engage_advantage": 1.15,
+          "mode_hold_s": 0.8,
+          "target_hold_s": 1.0,
+          "target_switch_ratio": 0.8,
+          "goal_hold_s": 2.0,
+          "goal_risk_weight": 65.0,
+          "support_radius": 70.0,
+          "support_weight": 0.55,
+          "behavior_half_life_s": 12.0,
+          "encounter_gap_s": 6.0,
+          "boost_start_fraction": 0.55,
+          "boost_stop_fraction": 0.25,
+          "escape_reserve": 8.0,
+          "pursuit_radius": 120.0,
+          "preferred_range": 70.0,
+          "reload_fraction": 0.4,
+          "loot_radius": 45.0,
+          "scan_period_s": 4.0,
+          "navigation_budget_ms": 0.6,
+          "decision_budget_ms": 35.0,
+          "heat_decay": 0.4,
+          "cover_rays": 4,
+          "max_tracks": 15,
+          "max_heat_cells": 256,
+          "max_encounters_kept": 16
+        },
+        "encounters": {
+          "closed": 0,
+          "kills": 0,
+          "contacts_escaped": 0,
+          "eliminated_after_contact": 0,
+          "damage_dealt": 0.0,
+          "damage_received": 3600.0,
+          "active": 15,
+          "recent": [],
+          "escape_definition": "No sensed or attributed contact for the configured gap while still alive; not proof the enemy stopped chasing.",
+          "loss_definition": "Non-winning end while contact remained active; does not identify who killed us."
+        },
+        "prediction_metrics": {
+          "prediction_samples": 3184,
+          "prediction_error_sum": 5840.649999999694,
+          "stuck_replans": 39,
+          "map_updates": 200,
+          "projectile_threats": 50,
+          "cover_queries": 800
+        },
+        "end": null,
+        "latency_sample_cap": 1024,
+        "score_source": "end message; recorded fixtures are not genuine match results",
+        "score": null
+      },
       "map": null,
       "note": "Synthetic/recorded implementation checks only; no gameplay or placement result. Official Docker checker is a separate gate."
     },
@@ -35,18 +180,163 @@
       "missed_ticks": 0,
       "exceptions": [],
       "latency_ms": {
-        "median": 5.348649999999999,
-        "p95": 16.4246,
-        "p99": 17.1736,
-        "max": 22.0339
+        "median": 6.4612359999999995,
+        "p95": 11.518766,
+        "p99": 11.851272,
+        "max": 12.502033
       },
       "late_actions": 0,
-      "peak_python_bytes": 441564,
-      "process_peak_rss_bytes": 68988928,
+      "peak_python_bytes": 480192,
+      "process_peak_rss_bytes": 73940992,
       "memory_note": "process lifetime peak; allocation sample is separate from latency",
       "safety_rule_violations": [],
       "assertion_failures": [],
       "timing_failures": [],
+      "behavior_checks": [
+        {
+          "scenario": "coordinated support lowers fight advantage",
+          "passed": true
+        },
+        {
+          "scenario": "attributed stationary attack records ambush evidence",
+          "passed": true
+        },
+        {
+          "scenario": "new damage is evidence despite quiet history",
+          "passed": true
+        },
+        {
+          "scenario": "lost contact records an encounter outcome",
+          "passed": true
+        },
+        {
+          "scenario": "blocked escape replans repeatedly",
+          "passed": true
+        },
+        {
+          "scenario": "stuck recovery still checks solid clearance",
+          "passed": true
+        },
+        {
+          "scenario": "small information changes do not flip mode every tick",
+          "passed": true
+        }
+      ],
+      "synthetic_match_seconds": 19.900000000000002,
+      "initial_spawn": null,
+      "policy": {
+        "name": "survival",
+        "weak_enter": 0.42,
+        "recovery_exit": 0.72,
+        "danger_enter": 0.9,
+        "danger_exit": 0.55,
+        "engage_advantage": 1.15,
+        "mode_hold_s": 0.8,
+        "target_hold_s": 1.0,
+        "target_switch_ratio": 0.8,
+        "goal_hold_s": 2.0,
+        "goal_risk_weight": 65.0,
+        "support_radius": 70.0,
+        "support_weight": 0.55,
+        "behavior_half_life_s": 12.0,
+        "encounter_gap_s": 6.0,
+        "boost_start_fraction": 0.55,
+        "boost_stop_fraction": 0.25,
+        "escape_reserve": 8.0,
+        "pursuit_radius": 120.0,
+        "preferred_range": 70.0,
+        "reload_fraction": 0.4,
+        "loot_radius": 45.0,
+        "scan_period_s": 4.0,
+        "navigation_budget_ms": 0.6,
+        "decision_budget_ms": 35.0,
+        "heat_decay": 0.4,
+        "cover_rays": 4,
+        "max_tracks": 15,
+        "max_heat_cells": 256,
+        "max_encounters_kept": 16
+      },
+      "mode_transitions": 100,
+      "telemetry": {
+        "schema": "mech-match-summary/1",
+        "actions": 200,
+        "errors": 0,
+        "mode_counts": {
+          "evade": 50,
+          "disengage": 150
+        },
+        "decision_ms": {
+          "p50_recent": 6.444851999958701,
+          "p95_recent": 11.501550000048155,
+          "p99_recent": 11.831284999971103,
+          "max": 12.482514999874184,
+          "late": 0
+        },
+        "stuck_seconds": 19.9,
+        "zone_seconds": 0.0,
+        "zone_damage": 0.0,
+        "weapon_damage_received": 3600.0,
+        "damage_dealt": 0.0,
+        "ammo_spent": 0,
+        "firing_actions": 0,
+        "budget_fallbacks": 0,
+        "policy": {
+          "name": "survival",
+          "weak_enter": 0.42,
+          "recovery_exit": 0.72,
+          "danger_enter": 0.9,
+          "danger_exit": 0.55,
+          "engage_advantage": 1.15,
+          "mode_hold_s": 0.8,
+          "target_hold_s": 1.0,
+          "target_switch_ratio": 0.8,
+          "goal_hold_s": 2.0,
+          "goal_risk_weight": 65.0,
+          "support_radius": 70.0,
+          "support_weight": 0.55,
+          "behavior_half_life_s": 12.0,
+          "encounter_gap_s": 6.0,
+          "boost_start_fraction": 0.55,
+          "boost_stop_fraction": 0.25,
+          "escape_reserve": 8.0,
+          "pursuit_radius": 120.0,
+          "preferred_range": 70.0,
+          "reload_fraction": 0.4,
+          "loot_radius": 45.0,
+          "scan_period_s": 4.0,
+          "navigation_budget_ms": 0.6,
+          "decision_budget_ms": 35.0,
+          "heat_decay": 0.4,
+          "cover_rays": 4,
+          "max_tracks": 15,
+          "max_heat_cells": 256,
+          "max_encounters_kept": 16
+        },
+        "encounters": {
+          "closed": 0,
+          "kills": 0,
+          "contacts_escaped": 0,
+          "eliminated_after_contact": 0,
+          "damage_dealt": 0.0,
+          "damage_received": 3600.0,
+          "active": 15,
+          "recent": [],
+          "escape_definition": "No sensed or attributed contact for the configured gap while still alive; not proof the enemy stopped chasing.",
+          "loss_definition": "Non-winning end while contact remained active; does not identify who killed us."
+        },
+        "prediction_metrics": {
+          "prediction_samples": 3184,
+          "prediction_error_sum": 5840.649999999694,
+          "stuck_replans": 39,
+          "map_updates": 200,
+          "projectile_threats": 50,
+          "cover_queries": 800
+        },
+        "end": null,
+        "latency_sample_cap": 1024,
+        "score_source": "end message; recorded fixtures are not genuine match results",
+        "score": null
+      },
       "map": null,
       "note": "Synthetic/recorded implementation checks only; no gameplay or placement result. Official Docker checker is a separate gate."
     }

@@ -2,10 +2,18 @@
 import math
 import os
 import random
+import time
 import mechfight as mf
 from arena_map import ArenaMap
 from navigation import Navigator
 from virtual_map import VirtualMap
+from config import load_policy
+from behavior_profiler import BehaviorProfiler
+from encounters import EncounterTracker
+from telemetry import Telemetry
+from survival import Survival
+from decision_engine import DecisionEngine
+from target_selector import assess,score as target_score
 
 
 def clamp(x,lo,hi):
@@ -40,11 +48,15 @@ DEFAULTS={'radius':2.5,'height':9.,'eye_height':8.,'muzzle_height':7.,'walk_spee
 class Bot:
     name='mech-royale-survivor'
 
-    def __init__(self,hello=None):
+    def __init__(self,hello=None,policy=None):
+        self.policy=load_policy(policy);self.profiler=BehaviorProfiler(self.policy)
+        self.encounters=EncounterTracker(self.policy,self.profiler);self.telemetry=Telemetry(self.policy)
+        self.survival=Survival(self.policy);self.controller=DecisionEngine(self.policy)
         self.rng=random.Random(0);self.tracks={};self.npcs={};self.heat={}
         self.last_pos=None;self.stuck=0;self.last_move=[0.,0.]
         self.arena=ArenaMap();self.nav=Navigator(self.arena);self.config={}
         self.stats=dict(DEFAULTS);self.world=VirtualMap(self.arena,self.config)
+        self.world.policy=self.policy
         self.debug_map=os.environ.get('MECH_DEBUG_MAP')=='1';self.last_map_revision=-1
         self.goal=None;self.goal_until=0.;self.target_id=None;self.target_until=0.
         self.mode='observe';self.jet=None;self.predictions=[];self.last_now=0.;self.blocked=0
@@ -63,6 +75,18 @@ class Bot:
     def act(self,o):
         return self.decide(o)
 
+    def end(self,message):
+        self.encounters.end(self.last_now,message)
+        return self.telemetry.export(self,message)
+
+    def fallback(self,o):
+        """Constant-work escape toward the known zone. No firing or pickup."""
+        me=o.get('self',{});p=vec(me.get('pos'));center=vec(o.get('zone',{}).get('center'),2)
+        dx,dy=center[0]-p[0],center[1]-p[1];n=max(1.,math.hypot(dx,dy))
+        return {'tick':int(o.get('tick',0)),'move':[dx/n,dy/n],'aim':vec(me.get('aim'),2),
+                'boost':me.get('in_zone') is False and me.get('energy',0)>self.policy.escape_reserve,
+                'jump':False,'fire':[False,False],'reload':False}
+
     def predict(self,t,now):
         self.world.arena=self.arena;self.world.stats=self.stats
         return self.world.predict(t,now)
@@ -70,6 +94,8 @@ class Bot:
     def remember(self,o,now,p):
         self.world.arena=self.arena;self.world.config=self.config
         self.world.update(o,self.stats)
+        self.profiler.update(self.world,o);self.encounters.update(self.world,o)
+        self.world._risk_cache.clear()
         self.tracks=self.world.tracks;self.npcs=self.world.npcs;self.heat=self.world.heat
         self.predictions=self.world.predictions
         if self.world.revision!=self.last_map_revision:
@@ -90,20 +116,15 @@ class Bot:
             q,c,u=self.predict(t,now)
             if c>0:choices.append(({'id':eid,'hp':t['hp'],'max_hp':t['max_hp'],'inferred':True},q,t['vel'],c))
         if not choices:return None
-        def score(x):
-            e,q,_,confidence=x
-            hp=e.get('hp');mh=e.get('max_hp')
-            weakness=1-clamp(hp/max(1,mh or 1400),0,1) if isinstance(hp,(int,float)) else .25
-            crowd=sum(1 for y in choices if y is not x and dist(y[1],q)<70)
-            return confidence*(1+weakness*.35)/(1+dist(p,q)/90+crowd*.7)
+        def score(x):return target_score(self,o,x)
         # Current sensor reports take priority over our own extrapolated
         # tracks, so a remembered opponent cannot prevent a real defensive shot.
         sensed=[x for x in choices if not x[0].get('inferred')]
         pool=sensed or choices
         best=max(pool,key=score)
         held=next((x for x in pool if x[0].get('id')==self.target_id),None)
-        if held and now<self.target_until and score(held)>=score(best)*.8:best=held
-        if best[0].get('id')!=self.target_id:self.target_until=now+1.
+        if held and now<self.target_until and score(held)>=score(best)*self.policy.target_switch_ratio:best=held
+        if best[0].get('id')!=self.target_id:self.target_until=now+self.policy.target_hold_s
         self.target_id=best[0].get('id')
         return best
 
@@ -130,10 +151,10 @@ class Bot:
             if best is not None and lower>best[0]:break
             z=self.arena.surface(q[0],q[1],p[2]+self.stats.get('step_up',1.2))
             if self.arena.solid_at([*q,z],self.stats['radius'],self.stats['height']):continue
-            score=lower+self.risk(q)*65
+            score=lower+self.risk(q)*self.policy.goal_risk_weight
             if best is None or score<best[0]:best=(score,q)
         self.goal=best[1] if best else list(center)
-        self.goal_until=now+2.;self.goal_risk=self.risk(self.goal)
+        self.goal_until=now+self.policy.goal_hold_s;self.goal_risk=self.risk(self.goal)
         return self.goal
 
     def incoming(self,o,p,vel):
@@ -142,6 +163,16 @@ class Bot:
         return [(h['pos'],h['vel']) for h in threats]
 
     def decide(self,o):
+        start=time.perf_counter();self.deadline=start+self.policy.decision_budget_ms/1000
+        try:action=self._decide(o)
+        except Exception:
+            self.telemetry.errors+=1
+            raise
+        self.telemetry.modes[self.mode]+=1
+        self.telemetry.observe(o,action,(time.perf_counter()-start)*1000)
+        return action
+
+    def _decide(self,o):
         tick=int(o.get('tick',0) or 0);now=clamp(o.get('t',tick/20),0,1e7);self.last_now=now
         me=o.get('self') if isinstance(o.get('self'),dict) else {}
         p,vel=vec(me.get('pos')),vec(me.get('vel'))
@@ -150,6 +181,8 @@ class Bot:
         self.stats.update({k:v for k,v in me.get('stats',{}).items() if isinstance(v,(int,float)) and math.isfinite(v)})
         self.nav.configure(self.stats)
         self.remember(o,now,p)
+        if time.perf_counter()>self.deadline:
+            self.telemetry.budget_fallbacks+=1;return self.fallback(o)
         zone=o.get('zone') if isinstance(o.get('zone'),dict) else {}
         center=vec(zone.get('center'),2);nc=vec(zone.get('next_center',center),2)
         radius=clamp(zone.get('radius',500),0,1e6);nr=clamp(zone.get('next_radius',radius),0,1e6)
@@ -158,37 +191,50 @@ class Bot:
         urgent=dist(p,center)>radius-12 or (soon<travel+5 and dist(p,nc)>nr-15) or me.get('in_zone') is False
         use_next=soon<max(30.,travel+10)
         safe_center,safe_radius=(nc,nr) if use_next else (center,radius)
-        weak=clamp(me.get('hp',1400),0,1e6)/max(1.,clamp(me.get('max_hp',1400),1,1e6))<.42
-        threats=[(h['pos'],h['vel']) for h in self.world.hazards];danger=self.risk(p)>.9 or bool(threats)
+        weak=self.survival.update(o,self.world)
+        pursuit=self.survival.pursuit(self.world)
+        local_risk=self.risk(p)
+        threats=[(h['pos'],h['vel']) for h in self.world.hazards];danger=local_risk>self.policy.danger_enter or bool(threats)
         target=self.candidates(o,now,p)
+        self.fight=assess(self,o,target)
         goal=self.safe_goal(p,safe_center,safe_radius,now,urgent)
-        self.mode='zone_move' if urgent else 'disengage' if weak or danger else 'reposition'
+        loot=[]
         # Visible resources only. Never invent NPC homes or random loot positions.
-        if not urgent and not danger and not weak:
-            loot=[]
+        if not urgent and not danger and not self.survival.recovering:
             held=[w.get('kind') for w in me.get('weapons',[]) if isinstance(w,dict)]
             empty=any(w is None for w in me.get('weapons',[None,None])) or len(me.get('weapons',[]))<2
             resources=items(o,'cubes')+([x for x in items(o,'pickups') if empty and x.get('kind') not in held])
             resources += [x for x in items(o,'drops') if x.get('lands_in',1)>-1 and x.get('lands_in',1)<=0 and x.get('holder') in (None,me.get('id'))]
             for x in resources:
                 q=vec(x.get('pos'))
-                if dist(p,q)<45 and abs(q[2]-p[2])<self.stats['step_up']+1 and dist(q,safe_center)<safe_radius-12 and self.risk(q)<.6:
+                if dist(p,q)<self.policy.loot_radius and abs(q[2]-p[2])<self.stats['step_up']+1 and dist(q,safe_center)<safe_radius-12 and self.risk(q)<.6:
                     loot.append((dist(p,q),q))
-            if loot:goal=min(loot,key=lambda x:x[0])[1];self.mode='gather'
+        self.mode=self.controller.choose(now,urgent,bool(threats),weak,self.survival.recovering,local_risk,
+                                         bool(pursuit),self.fight['advantage'],bool(target and not target[0].get('inferred')),bool(loot))
+        if self.mode=='gather' and loot:goal=min(loot,key=lambda x:x[0])[1]
         moved=self.last_pos is not None and dist(p,self.last_pos)>.2
         if self.last_pos is not None and not moved and math.hypot(*self.last_move)>.3 and math.hypot(*vel[:2])<1:self.stuck+=1
         else:self.stuck=max(0,self.stuck-1)
         self.last_pos=p
-        if self.stuck==5:
+        if self.stuck>=5 and self.stuck%5==0:
             self.nav.invalidate();self.metrics['stuck_replans']+=1
+            self.goal_until=0.
+        # Persistently blocked movement gets a different checked escape heading.
+        # It still passes through the same cylinder/terrain steering checks.
+        recovery_heading=None
+        if self.stuck>=10:
+            angle=(int(self.stuck/10)%8)*math.pi/4+self.rng.random()*.05
+            recovery_heading=[math.cos(angle),math.sin(angle)]
         self.current_goal=list(goal)
-        waypoint=self.nav.waypoint(p,goal,self.risk,now,revision=self.world.revision)
+        waypoint=self.nav.waypoint(p,goal,self.risk,now,budget_ms=self.policy.navigation_budget_ms,revision=self.world.revision)
         desired=[waypoint[0]-p[0],waypoint[1]-p[1]]
         if math.hypot(*desired)<.1 and dist(p,goal)>3 and self.nav.status in ('searching','refining','no_route','no_anchor'):
             desired=[goal[0]-p[0],goal[1]-p[1]]
-        if target and not urgent and not danger and not weak and not target[0].get('inferred') and dist(p,target[1])<110:
+        if target and self.mode=='engage' and not target[0].get('inferred') and dist(p,target[1])<110:
             q=target[1];away=[p[0]-q[0],p[1]-q[1]];n=max(1.,math.hypot(*away))
-            desired=[-away[1]/n*.7+away[0]/n*.3,away[0]/n*.7+away[1]/n*.3];self.mode='engage'
+            spacing=clamp((self.policy.preferred_range-n)/25,-.5,.7)
+            desired=[-away[1]/n*.7+away[0]/n*spacing,away[0]/n*.7+away[1]/n*spacing]
+        if recovery_heading:desired=recovery_heading
         if threats:
             q,sv=min(threats,key=lambda x:dist(p,x[0]));side=[-sv[1],sv[0]]
             if side[0]*(p[0]-q[0])+side[1]*(p[1]-q[1])<0:side=[-x for x in side]
@@ -202,7 +248,7 @@ class Bot:
         if not self.jet and max(self.stuck,self.blocked)>=8 and not threats and math.hypot(*move)<.2:
             self.jet=self.nav.jet_plan(p,[goal[0]-p[0],goal[1]-p[1]],me,self.stats)
             if self.jet:self.jet['expires']=now+self.jet['needed_seconds']+2.
-        boost=bool((urgent or threats) and me.get('energy',100)>8)
+        boost=self.survival.boost(me,bool(urgent or threats),bool(pursuit),self.mode in ('disengage','recover','reposition'))
         jump=bool(threats and me.get('grounded') and me.get('energy',100)>8)
         if self.jet:
             if now>self.jet['expires'] or me.get('energy',0)<10:self.jet=None
@@ -216,21 +262,24 @@ class Bot:
                         self.jet=None;move=[0.,0.];boost=False
                     if dist(p,q)<1.5:self.jet=None;self.nav.invalidate()
         self.last_move=move
+        if time.perf_counter()>self.deadline:
+            self.telemetry.budget_fallbacks+=1
+            action=self.fallback(o);action.update(move=move,boost=boost,jump=jump)
+            return action
         from combat import aim_and_fire
-        aim,fire=aim_and_fire(self,o,p,target,weak or danger or urgent)
+        unsafe=weak or danger or urgent or self.mode in ('disengage','recover')
+        aim,fire=aim_and_fire(self,o,p,target,unsafe)
+        if self.mode=='recover' and not pursuit and local_risk<self.policy.danger_exit:
+            fire=[False,False]
+        if self.mode=='observe' and not target:
+            aim=[(now/self.policy.scan_period_s*math.tau+math.pi)%math.tau-math.pi,0.]
         action={'tick':tick,'move':[clamp(x,-1,1) for x in move],'boost':boost,'jump':jump,
-                'aim':aim,'fire':fire,'reload':any(isinstance(w,dict) and w.get('kind')=='gun' and w.get('ammo',1)==0 and w.get('reload',0)==0 for w in me.get('weapons',[]))}
-        if not weak and not danger and not urgent:
-            held=[w.get('kind') for w in me.get('weapons',[]) if isinstance(w,dict)]
-            if len(held)<2:
-                for x in items(o,'pickups'):
-                    q=vec(x.get('pos'))
-                    if x.get('kind') not in held and dist(p,q)<self.config.get('loot',{}).get('pickup_radius',4.) and abs(p[2]-q[2])<4:
-                        action['take']=x['id'];break
+                'aim':aim,'fire':fire,'reload':self.survival.reload(me,not target and not danger and not urgent)}
+        if not self.survival.recovering and not danger and not urgent:
+            action.update(self.survival.pickup(me,items(o,'pickups'),self.config))
         offer=o.get('offer');choices=offer.get('choices',[]) if isinstance(offer,dict) else []
         if choices:
-            ranks={'armor':10,'plating':9,'nanites':8,'servos':7,'reactor':6,'jets':5,'capacitor':4,'sensors':3}
-            action['pick']=max(range(min(3,len(choices))),key=lambda i:ranks.get(choices[i].get('id'),1))
+            action['pick']=self.survival.upgrade(choices,me,self.config)
         if self.debug_map:action['debug']=self.world.debug_draw(self.nav.route or [getattr(self.nav,'last_waypoint',p)],goal,self.mode)
         return action
 

@@ -1,4 +1,5 @@
 work/
+kit/
 outputs/
 __pycache__/
 *.py[cod]

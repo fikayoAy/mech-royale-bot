@@ -1,0 +1,72 @@
+{
+  "implementation": "complete",
+  "active_local_folder": "C:/Users/ayode/machina/mech-royale-merge",
+  "vm_installation": "/home/ayode/mech-royale on instance-20261121-213125, outside the Machina dataset",
+  "vm_backup": "/home/ayode/mech-royale-before-roadmap-20261122T045346Z.tar.gz",
+  "milestones": [
+    {
+      "name": "Protocol and fallback",
+      "state": "implemented",
+      "source": "mechfight.py, bot.py",
+      "validation": "handshake, tick, end and error-fallback unit tests plus official checker"
+    },
+    {
+      "name": "Full public map and navigation",
+      "state": "implemented",
+      "source": "arena_map.py, navigation.py",
+      "validation": "terrain, solids, holes, trees, roofs, air motion, route and collision tests"
+    },
+    {
+      "name": "Known enemy and NPC memory",
+      "state": "implemented",
+      "source": "virtual_map.py",
+      "validation": "uncertainty, expiry, no invented identities, prediction and cap tests"
+    },
+    {
+      "name": "Observed behavior profiles",
+      "state": "implemented",
+      "source": "behavior_profiler.py",
+      "validation": "chase, retreat, attributed stationary attack, unknown and misleading-history tests"
+    },
+    {
+      "name": "Activity and immediate threat",
+      "state": "implemented",
+      "source": "virtual_map.py",
+      "validation": "sound/damage areas, cover, branches, zone forecasts and swept projectile tests"
+    },
+    {
+      "name": "Fight and escape choices",
+      "state": "implemented",
+      "source": "target_selector.py, survival.py",
+      "validation": "health/weapon/support estimates, pursuit boost, energy reserve and recovery tests"
+    },
+    {
+      "name": "Stable integrated modes",
+      "state": "implemented",
+      "source": "decision_engine.py, bot.py",
+      "validation": "emergency override, target/mode holds, scanning and stuck recovery tests"
+    },
+    {
+      "name": "Encounter learning and telemetry",
+      "state": "implemented",
+      "source": "encounters.py, telemetry.py",
+      "validation": "kill, contact escape, defeat-context, damage feedback, bounded end-summary tests"
+    },
+    {
+      "name": "Five-level testing and release",
+      "state": "implemented",
+      "source": "tests/, tools/, Dockerfile",
+      "validation": "two seeds, 480-second inputs, native AMD64 exact sandbox, repeated unchanged checker and source hash comparison"
+    }
+  ],
+  "release_gate_summary": "reports/validation_summary.json",
+  "public_repository": "https://github.com/fikayoAy/mech-royale-bot",
+  "external_step": {
+    "state": "requires explicit approval",
+    "action": "official practice submission of the tested commit",
+    "reason": "The supplied roadmap says not to automate tournament submissions without explicit approval.",
+    "new_score": null,
+    "local_gameplay_simulator_available": false
+  },
+  "next_iteration": "Use a genuine practice receipt and per-match telemetry to find zone, stuck or unfavorable-encounter failures. No improvement in placement is claimed from these tests."
+}

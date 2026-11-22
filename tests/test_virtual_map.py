@@ -7,7 +7,7 @@ from pathlib import Path
 import sys
 import unittest
 
-sys.path.insert(0,str(Path(__file__).resolve().parents[1]))
+sys.path.insert(0,os.environ.get('MECH_RUNTIME_DIR',str(Path(__file__).resolve().parents[1])))
 from arena_map import ArenaMap
 from bot import Bot,DEFAULTS
 from navigation import Navigator

@@ -537,6 +537,11 @@ def run(make_bot: Any) -> None:
             elif kind == "obs":
                 latest = msg
             elif kind == "end":
+                if bot is not None and hasattr(bot,"end"):
+                    try:
+                        bot.end(msg)
+                    except Exception:
+                        log("end summary failed:\n"+traceback.format_exc())
                 return
         if latest is None:
             continue
@@ -551,6 +556,11 @@ def run(make_bot: Any) -> None:
                 if errors <= 5 or errors % 100 == 0:
                     log(f"act() failed at tick {latest['tick']} ({errors} so far):\n{traceback.format_exc()}")
                 action = dict(last)
+                if hasattr(bot,"fallback"):
+                    try:
+                        action = dict(bot.fallback(latest))
+                    except Exception:
+                        pass
         action["tick"] = latest["tick"]
         d = draw.take()
         if d and "debug" not in action:

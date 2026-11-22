@@ -10,7 +10,7 @@ from pathlib import Path
 import sys
 import unittest
 
-ROOT=Path(__file__).resolve().parents[1]
+ROOT=Path(os.environ.get('MECH_RUNTIME_DIR',str(Path(__file__).resolve().parents[1])))
 sys.path.insert(0,str(ROOT))
 from arena_map import ArenaMap
 from navigation import Navigator

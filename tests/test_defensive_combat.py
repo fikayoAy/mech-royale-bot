@@ -1,10 +1,11 @@
 """Pressure combat regressions: escape movement and self-defense can coexist."""
 import math
+import os
 from pathlib import Path
 import sys
 import unittest
 
-sys.path.insert(0,str(Path(__file__).resolve().parents[1]))
+sys.path.insert(0,os.environ.get('MECH_RUNTIME_DIR',str(Path(__file__).resolve().parents[1])))
 from bot import Bot
 from combat import aim_and_fire
 from test_navigation import observation,actor,SCHEMA

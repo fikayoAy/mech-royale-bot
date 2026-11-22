@@ -10,7 +10,20 @@
       "queue_label_source": "https://www.joinbuilders.org/_next/static/immutable/chunks/10cygbhcf1s8b.js",
       "replay_available": false,
       "cause_of_deaths": "Unknown; no replay or per-match trace supplied."
+    },
+    {
+      "receipt": null,
+      "reported_score": 0.96,
+      "commit": null,
+      "possible_commit": "a4980d483a2be39a75f2461d48680ce4b19bc64e",
+      "commit_verified": false,
+      "source": "user reported score only; no receipt or commit supplied",
+      "average_place_from_score": 15.04,
+      "replay_available": false
     }
   ],
-  "new_defensive_fire_version_scored": false
+  "new_defensive_fire_version_scored": false,
+  "best_reported_score": 0.96,
+  "best_reported_commit": null,
+  "roadmap_version_scored": false
 }

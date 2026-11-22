@@ -1,0 +1,170 @@
+HISTORICAL AUDIT: this describes commit a4980d4 before roadmap completion.
+See roadmap_completion.json and roadmap-amd64/ for the current implementation.
+
+MECH ROYALE ROADMAP AUDIT
+Reviewed: 2026-11-22
+Working copy: C:\Users\ayode\machina\mech-royale-merge
+Commit: a4980d483a2be39a75f2461d48680ce4b19bc64e
+
+VERDICT
+The implementation follows the roadmap in part. The protocol, public map,
+bounded memory, threat map and packaging are implemented. The full behavior,
+encounter learning, measurement and scenario-testing requirements are incomplete.
+Passing the present checks does not establish competitive match performance.
+
+This was a review. No runtime code was changed.
+48 unit tests were rerun and passed. All seven runtime/build source hashes match
+the saved VM validation. Saved five-level and Docker runs were reviewed rather
+than rerun, because their tested runtime hashes still match.
+The tracked repository is 900,119 bytes, below the 20 MB limit.
+The IDE's https-www-joinbuilders-org-buildathon-tracks folder is an older copy;
+the latest merged/submitted working copy reviewed here is mech-royale-merge.
+
+STATUS BY ROADMAP MILESTONE
+
+1. Protocol baseline: IMPLEMENTED
+   Official wrapper handles hello, ready, latest observations, tick echo, end,
+   stderr errors and a last-action fallback. Starter and current checker reports
+   exist. RNG is seeded from hello.seed.
+   Evidence: mechfight.py:498-562; bot.py:54-61; reports/official-starter.json.
+
+2. Static map/navigation: IMPLEMENTED WITH KNOWN LIMITS
+   Loads the full terrain and public world sections. Uses solid prisms, holes,
+   trees, bridges, roofs and bounds. Includes route search, local steering,
+   slope/step/size checks, 3D air checks, jet estimates and stuck recovery.
+   Tests cover coordinates, heights, courtyards, bridge clearance and obstacles.
+   Routes and physics are planning estimates; the server is authoritative.
+   Evidence: arena_map.py; navigation.py; tests/test_navigation.py.
+
+3. Enemy memory: IMPLEMENTED BASELINE
+   Known IDs only, bounded retention, timestamps, velocity, fading confidence,
+   expanding uncertainty and straight/left/right/stay possibilities. Predictions
+   respect map obstacles. Sensor facts and inferred tracks are labeled.
+   The branch weights are fixed hints, not learned or calibrated probabilities.
+   Evidence: virtual_map.py:49-78, 92-117, 145-148; test_virtual_map.py.
+
+4. Behavior modeling: PARTIAL
+   Aggression changes with approach velocity and attributed damage.
+   Chase, retreat, ambush and isolation profiles are not implemented as sustained
+   behavior models. There is no encounter win/loss or escape-outcome learning.
+   Unknown behavior starts at aggression 0.5; evidence count exists, but behavior
+   uncertainty is not explicitly used to keep unknown profiles separate.
+   Evidence: virtual_map.py:96-113, 135-140.
+
+5. Threat heatmap: IMPLEMENTED BASELINE
+   Bounded fading activity cells, sound-bearing bands, beam origins, known actor
+   predictions, NPC danger, swept projectile threats, cover and zone forecasts.
+   Sounds do not invent actor identities or exact positions.
+   Cover has a strict query budget; unchecked clearance stays dangerous.
+   Evidence: virtual_map.py:80-89, 118-173, 180-255.
+
+6. Fight/escape and survival policy: PARTIAL
+   Target selection uses confidence, distance, target weakness and nearby actors.
+   Weapon-aware lead, range, line checks and defensive fire are implemented.
+   It does not compare likely fight outcome with escape outcome using both
+   sides' weapons, damage rates, resources and escape opportunities.
+   Reloading starts only on an empty gun. Upgrade choices use a fixed ranking.
+   Pursuit-aware energy/boost use and explicit recovery behavior are incomplete.
+   Evidence: bot.py:82-108, 144-241; combat.py.
+
+   Confirmed example, reproduced in this audit:
+   - HP 250, energy 100, opponent 20 m away closing at 19.5 m/s.
+   - No immediate projectile or zone emergency.
+   - Bot chooses disengage and moves away, but boost=false.
+   - Configured walking speed is 11.7 m/s; boost speed is 19.5 m/s.
+   This is a policy gap, not proof that it caused the reported match deaths.
+
+7. Integrated controller: PARTIAL
+   Priority overrides, bounded replanning, collision-checked fallback movement,
+   target holding and goal holding exist.
+   Observe is only an initial label; there is no active observe/scan state.
+   Mode switching has no separate hold/recovery thresholds to prevent repeated
+   engage/disengage switching. Holding a target is not full mode hysteresis.
+   Evidence: bot.py:49-50, 105-107, 165-217.
+
+8. Measurement and tuning: PARTIAL
+   Decision timing, memory, aggregate prediction error and replan counts exist.
+   Runtime zone damage, actual stuck duration, engagement outcomes and end-of-
+   match summaries are not fully recorded.
+   The official wrapper returns on end without exporting bot match metrics.
+   The replay viewer reads fixed observations; it is not a reactive game.
+   Evidence: virtual_map.py:46-47, 103-105, 258-275; mechfight.py:540-541;
+   tools/export_map_viewer.py; reports/validation_summary.json.
+
+FIVE-LEVEL TEST REQUIREMENTS: PARTIAL COVERAGE
+
+Implemented:
+- Exactly five levels, --all, --level 1..5 and repeated --seed.
+- Current schema validation, finite outputs, tick checks, fail-fast errors.
+- Median/p95/p99/max, late actions, memory and separate behavior/timing failures.
+- Both seeds 17 and 29 pass in the saved workstation and VM runs.
+- Focused tests cover lost-track uncertainty, cover, projectiles, route changes,
+  defensive fire and resource/zone priorities.
+
+Still missing or weak:
+- Level 4 has a fixed nearby group; it does not provide separate sustained
+  ambush, retreat, coordinated pursuit and misleading-history tests.
+- No explicit repeated-target-oscillation test or long stuck/recovery test.
+- Level 5's synthetic run is 1,200 decisions at 0.1 s: about 120 match seconds.
+  It does not test a continuous full 480-second match lifecycle.
+- Seeds vary enemy/projectile data, but own synthetic spawn is mostly fixed.
+  Broad varied-spawn traversal coverage of the real map is missing.
+- The level-5 stress input is finite, not evidence of a proven worst-case bound.
+- Missing optional fields are covered narrowly by a unit test, not broadly across
+  the level-2 fixture set.
+- The Docker checker is a separate recorded-stream gate. It does not run all
+  synthetic worst-case scenarios under the constrained container.
+
+RUNTIME AND RELEASE CHECKLIST
+
+Implemented/verified:
+- Official-derived Dockerfile at repository root, unbuffered Python entrypoint.
+- Python base pinned by digest; runtime uses the standard library.
+- Map is mounted rather than included in the runtime image.
+- Saved Docker command uses AMD64, 1 CPU, 512 MB, no network, uid 65534,
+  read-only root/map and a 64 MB tmpfs.
+- Saved official native and Docker checker results pass.
+- Sandbox peak RSS: 69,414,912 bytes (about 66.2 MiB).
+- Public GitHub upload and a real scored submission were reported by the user.
+- No automated tournament submission was made by this workflow.
+
+Incomplete evidence:
+- Native VM is Debian/ARM64, not Ubuntu/AMD64. This is documented.
+- Native ARM checker p99: 2.3 ms; 300/300 on time.
+- Emulated AMD64 checker p99: 50.8 ms; 296/300 on time, 4 late; checker PASS.
+  That passes the official allowance, but does not demonstrate comfortable
+  sub-50-ms margin on that setup. Native AMD64 full-workload timing is unmeasured.
+- A successful image build is recorded; exact clean-build duration is not saved.
+- Policy thresholds/weights are scattered constants rather than a central,
+  independently tunable policy configuration. Proposed filenames may be
+  consolidated under the prompt, so missing filenames alone are not a defect.
+- The source emits no routine stdout logs; debug drawings are optional and
+  protocol-capped.
+
+MATCH EVIDENCE AND RECORD KEEPING
+
+- Saved practice entry: score 0.25, receipt BB-E16EF5BF, commit 38c5e47a7505.
+- User subsequently reported score 0.96.
+- The local practice-results file still contains only the 0.25 entry.
+- The 0.96 receipt and exact submitted commit were not supplied; do not label
+  that result as a verified score for a4980d4 merely because it is the local HEAD.
+- Official page currently lists the starter baseline as 1.15. The reported 0.96
+  does not yet show that the competitive-performance goal has been achieved.
+- A scored entry alone does not reveal why deaths occurred; replay/telemetry was
+  unavailable. The corrected firing rule is a code-level finding, not a proven
+  explanation for every lost match.
+
+PRIORITY TO CLOSE THE ROADMAP
+1. Complete pursuit escape, energy/regen handling and fight-versus-escape policy.
+2. Add explicit unknown/chase/retreat/ambush profiles and encounter outcomes.
+3. Add active observation and mode-switching stability.
+4. Add full-match, varied-spawn and repeated-stuck/target-switch test cases.
+5. Export match summaries and keep each reported score with its exact commit.
+6. Measure the full workload on native AMD64 and preserve timing margin.
+7. Centralize policy weights separately from test strictness.
+
+SOURCES
+User's attached implementation roadmap.
+Official current challenge: https://www.joinbuilders.org/buildathon/tracks/builders
+Downloaded official kit: mech-royale-upload-backup-20261122-030550/work/official-kit/mechfight-kit
+Current code and saved reports in this working copy.

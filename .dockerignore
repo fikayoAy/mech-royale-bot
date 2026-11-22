@@ -2,6 +2,7 @@
 reports
 tests
 work
+kit
 outputs
 count_video_samples.py
 __pycache__

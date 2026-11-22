@@ -1,5 +1,6 @@
 """Exactly five deterministic policy levels. Conformance and matches are separate."""
 import argparse
+import os
 import copy
 import gc
 import json
@@ -11,12 +12,13 @@ import time
 import tracemalloc
 from pathlib import Path
 
-ROOT=Path(__file__).resolve().parents[1]
+ROOT=Path(os.environ.get('MECH_RUNTIME_DIR',str(Path(__file__).resolve().parents[1])))
 sys.path.insert(0,str(ROOT))
 from bot import Bot
 from arena_map import ArenaMap
 from navigation import Navigator
 from test_navigation import HELLO,BASE,SCHEMA,actor,observation,prism,KIT
+from roadmap_scenarios import checks as behavior_checks
 import gzip
 
 REPORTS=ROOT/'reports'
@@ -58,6 +60,10 @@ def scenario(level,index,rng):
     if level in (1,3,4,5) or index%6==0:o['mechs']=[actor()]
     if level==2:
         o['sounds']=[{'kind':'gun','bearing':rng.uniform(-math.pi,math.pi),'dist':rng.choice(['near','mid','far']),'age':.1}]
+        for e in o['mechs']:
+            for field in ('hp','max_hp','weapons','charging','cubes'):e.pop(field,None)
+    if level==3:
+        o['mechs']=[actor(1,[55.,5.,0.]),actor(2,[-70.,30.,0.]),actor(3,[40.,-90.,0.])]
     if level>=3 and index%4==0:
         o['self'].update(hp=250.,energy=10.)
         o['zone'].update(radius=85.,next_radius=65.,shrink_start=o['t']+.2,shrink_end=o['t']+20)
@@ -65,9 +71,11 @@ def scenario(level,index,rng):
         o['projectiles']=[{'id':99,'kind':'gun','pos':[4.,0.,1.],'vel':[-10.,0.,0.]}]
     if level>=4:
         o['mechs']=[actor(j,[30*math.cos(j*.4),30*math.sin(j*.4),0.]) for j in range(1,16)]
+        for a in o['mechs']:a['vel']=[-19.5*a['pos'][j]/30 for j in range(2)]+[0.]
         o['mechs'].append(actor(104,[10.,0.,0.],'npc'))
         if index%5==0:o['events']=[{'type':'damaged','amount':90.,'weapon':'gun','bearing':0.,'by':1,'rear':True}]
     if level==5:
+        o['mechs'] += [actor(105+j,[80.+j,40.,0.],'npc') for j in range(11)]
         if index%7==0:o['self'].update(grounded=False,pos=[0.,0.,12.],vel=[2.,-3.,4.])
         # These assignments happen BEFORE decide(), unlike the old unused stress data.
         for a in o['mechs']:
@@ -77,19 +85,43 @@ def scenario(level,index,rng):
                              'pos':[rng.uniform(-90,90),rng.uniform(-90,90),rng.uniform(0,20)],
                              'vel':[rng.uniform(-100,100),rng.uniform(-100,100),rng.uniform(-30,30)]} for j in range(32)]
         o['sounds']=[{'kind':'gun','bearing':rng.uniform(-math.pi,math.pi),'dist':rng.choice(['near','mid','far']),'age':rng.random()} for _ in range(16)]
+        o['beams']=[{'by':j+1,'kind':'laser' if j%2 else 'lightning',
+                     'path':[o['mechs'][j]['pos'][:],[0.,0.,4.5]],'age':.1} for j in range(8)]
     return o
 
 
 def run_level(level,seed):
     rng=random.Random(seed+level);hello=copy.deepcopy(HELLO)
     hello['seed']=seed
-    if level==5:hello['map']['dir']=str(KIT/'arena')
+    if level in (1,5):hello['map']['dir']=str(KIT/'arena')
     else:hello['map']={}
     bot=Bot(hello)
     times=[];failures=[];violations=[];invalid=[];exceptions=[];missed=0
-    count={1:80,2:120,3:160,4:200,5:1200}[level]
+    assertions=behavior_checks(level)
+    failures.extend(x['scenario'] for x in assertions if not x['passed'])
+    count={1:80,2:120,3:160,4:200,5:4801}[level]
+    spawn=None
+    if level==5:
+        # A different legal initial ground position for each seed. This is a
+        # scripted stress stream, not a physics simulation of resulting moves.
+        bounds=bot.arena.bounds
+        for _ in range(1000):
+            x=rng.uniform(bounds['minX']+10,bounds['maxX']-10);y=rng.uniform(bounds['minY']+10,bounds['maxY']-10)
+            q=[x,y,bot.arena.ground(x,y)]
+            if not bot.arena.solid_at(q,bot.stats['radius'],bot.stats['height']):spawn=q;break
+        if spawn is None:raise AssertionError('No valid seeded spawn found')
     for i in range(count):
         o=scenario(level,i,rng)
+        if spawn:
+            o['self']['pos']=[spawn[0],spawn[1],spawn[2]+(12. if not o['self']['grounded'] else 0.)]
+            o['zone'].update(center=spawn[:2],next_center=[spawn[0]+20,spawn[1]+10])
+            for e in o['mechs']:
+                e['pos'][0]+=spawn[0];e['pos'][1]+=spawn[1];e['pos'][2]+=spawn[2]
+            for shot in o['projectiles']:
+                shot['pos']=[shot['pos'][j]+spawn[j] for j in range(3)]
+            for item in o['pickups']:item['pos']=[spawn[0]+1,spawn[1],spawn[2]]
+            for beam in o['beams']:
+                beam['path']=[[q[j]+spawn[j] for j in range(3)] for q in beam['path']]
         errors=SCHEMA.errors(o,'Observation')
         if errors:raise AssertionError('Invalid synthetic fixture: '+str(errors))
         try:
@@ -108,9 +140,10 @@ def run_level(level,seed):
             if not a['boost'] or (o['self']['grounded'] and not a['jump']):violations.append('incoming projectile not evaded')
         if level==2 and not o['mechs'] and any(a['fire']):violations.append('fired at an inferred track')
         if len(bot.tracks)>15 or len(bot.npcs)>32 or len(bot.heat)>256:violations.append('memory cap exceeded')
-    # A full official recorded workload also exercises the actual map at level 5.
-    if level==5:
+    # Normal recorded inputs at level 1; the full official workload at level 5.
+    if level in (1,5):
         recorded=Bot(hello)
+        recorded_count=0
         with gzip.open(KIT/'check/stream.jsonl.gz','rt') as stream:
             for line in stream:
                 o=json.loads(line)
@@ -118,6 +151,8 @@ def run_level(level,seed):
                 start=time.perf_counter_ns();a=recorded.decide(o)
                 times.append((time.perf_counter_ns()-start)/1e6)
                 if SCHEMA.errors(a,'Action') or a['tick']!=o['tick']:failures.append('recorded action invalid')
+                recorded_count+=1
+                if level==1 and recorded_count>=30:break
         if recorded.arena.load_error:failures.append('official map failed to load')
     if level==2:
         probe=Bot();o=observation();o['mechs']=[actor()];probe.decide(o)
@@ -140,6 +175,8 @@ def run_level(level,seed):
             'p99':percentile(times,.99),'max':max(times)},'late_actions':late_count,'peak_python_bytes':python_peak,
             'process_peak_rss_bytes':rss,'memory_note':'process lifetime peak; allocation sample is separate from latency',
             'safety_rule_violations':sorted(set(violations)),'assertion_failures':failures+invalid,'timing_failures':timing,
+            'behavior_checks':assertions,'synthetic_match_seconds':(count-1)*.1,'initial_spawn':spawn,
+            'policy':bot.policy.export(),'mode_transitions':bot.controller.transitions,'telemetry':bot.telemetry.summary(bot),
             'map':bot.arena.summary() if level==5 else None,
             'note':'Synthetic/recorded implementation checks only; no gameplay or placement result. Official Docker checker is a separate gate.'}
 

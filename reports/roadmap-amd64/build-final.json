@@ -1,0 +1,17 @@
+{
+  "command": [
+    "sudo",
+    "docker",
+    "build",
+    "--platform",
+    "linux/amd64",
+    "--no-cache",
+    "-t",
+    "mech-agent:roadmap",
+    "."
+  ],
+  "seconds": 2.409314009999889,
+  "exit_code": 0,
+  "stdout": "Sending build context to Docker daemon  167.9kB\n\nStep 1/4 : FROM python:3.13-slim@sha256:e48f59cdba69a3cbd9ed2cf0f348d90d45a8d350d98134cf1070bc106ee9ed90\n ---> e48f59cdba69\nStep 2/4 : WORKDIR /bot\n ---> Running in 9188939ac0b6\n ---> Removed intermediate container 9188939ac0b6\n ---> 5c11fc241112\nStep 3/4 : COPY bot.py mechfight.py arena_map.py navigation.py combat.py virtual_map.py config.py behavior_profiler.py encounters.py telemetry.py survival.py target_selector.py decision_engine.py ./\n ---> 46d21633f983\nStep 4/4 : ENTRYPOINT [\"python3\", \"-u\", \"/bot/bot.py\"]\n ---> Running in e8fb4d7644d2\n ---> Removed intermediate container e8fb4d7644d2\n ---> 100833e72d23\nSuccessfully built 100833e72d23\nSuccessfully tagged mech-agent:roadmap\n",
+  "stderr": "DEPRECATED: The legacy builder is deprecated and will be removed in a future release.\n            Install the buildx component to build images with BuildKit:\n            https://docs.docker.com/go/buildx/\n\n"
+}

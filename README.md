@@ -1,118 +1,95 @@
 # Mech Royale Survivor
 
-A survival-first bot for the official mechfight/1 protocol. It uses Python's standard library and the unchanged official Python wrapper. It aims to improve placement by avoiding crowded fights, escaping danger and moving into the next safe zone early.
+A survival-first mechfight/1 bot. The active working copy is `C:/Users/ayode/machina/mech-royale-merge`. The older IDE folder is not the release copy.
 
-## Map and movement
+## What the bot does
 
-The bot loads the complete mounted map from hello.map.dir (normally /arena):
+- Loads the full public terrain, buildings, stadium, bridges, courtyards, roofs, trees and bounds. Other map sections remain available as scenery.
+- Tracks only known opponents and observed NPCs. Lost tracks fade and gain uncertainty; sounds add broad activity areas without creating enemy identities.
+- Keeps observed aggression, chase, retreat, stationary-attack and isolation evidence. Unknown values stay unknown. These are tendencies, not claims about hidden intent.
+- Records contact, damage, confirmed kills, lost contact and defeat after contact. Defeat does not identify a killer. Encounter damage trades feed bounded threat estimates.
+- Compares estimated fight duration, health, weapons, energy and nearby support. It favors escape from crowded or poor fights and uses short holds to limit target and mode changes.
+- Uses observe, gather, reposition, engage, disengage, recover, evade and zone-move modes, with guarded jet escape when blocked. Pursuit escape uses boost with a fuel reserve and separate start/stop thresholds.
+- Checks routes and local steering against terrain, solids, live mech size, steps and slopes. It retries a finer grid, replans dangerous routes and changes checked headings when stuck.
+- Aims using observed velocity and weapon mechanics from `hello.config`. Clear gun shots can continue during escape. New laser charges and mortar shots stay blocked under pressure. Quiet low magazines reload early; safe pickups can replace a weaker secondary weapon.
+- Records decision time, prediction error, stuck time, zone damage, ammunition, modes, encounters and the supplied end result. Stdout contains protocol messages only.
 
-- All 774,680 signed terrain samples, with bilinear height sampling.
-- All 259 solid prisms: 223 buildings, 27 stadium sections and 9 bridges.
-- Building holes/courtyards, roofs, bridge decks and underpasses.
-- All 1,560 trees for sight estimates. Trees block neither movement nor shots.
-- Map bounds and every other world.json section. Cars, water, parking and barriers stay available as scenery; official rules say they do not block movement.
+`virtual_map.py` combines the world model, enemy tracker and heatmap to avoid copying state between modules. Other policy parts live in `config.py`, `behavior_profiler.py`, `encounters.py`, `target_selector.py`, `survival.py`, `decision_engine.py`, `combat.py` and `navigation.py`.
 
-Routes use several waypoints and continue searching across observations, with a small work budget per decision. The route grid covers the map rather than only one blocking building. Route segments and tactical dodges/strafe moves check cylinder clearance, live mech size, slopes, steps and guarded roof drops. Movement caches are reset when the mech's size or walking limits change.
+The wrapper retains the official latest-observation handling. Small additions call our fallback after an error and export the end summary. The official checker itself is unchanged.
 
-Air movement uses a short prediction with momentum, air acceleration, gravity, rise limits, jet fuel and landing checks. A blocked route can attempt an energy-limited jet escape after checking the overhead and lateral path.
+## Run locally
 
-These are bounded planning checks, not a copy of the server's full physics engine. Routes start on a 6 m grid and retry failed coarse searches on a 3 m grid. Narrow passages can still be missed, long searches can run out of their node budget, and large drops are deliberately avoided. The bot cannot assume every rooftop is reachable with its remaining energy.
+Python 3.9+; runtime uses the standard library only. From the repository root:
 
-## Shared virtual map
-
-virtual_map.py is the shared source of changing battlefield knowledge. The bot uses it for danger, memory, projectile avoidance and route updates.
-
-- Static facts: the full public terrain, solids, holes, trees and bounds.
-- Sensed actors: only IDs present in official observations, including server-provided sensor memory.
-- Inferred actors: fading memory with straight, left, right and stationary movement possibilities. Every branch is checked against the map. Branch weights are planning hints, not measured probabilities.
-- Activity: fading sound areas and seen beam origins. Sounds never create an enemy ID or an exact enemy position.
-- Resources: bounded, time-stamped crate/cube/weapon memory. Sensed and inferred resources are labeled separately; taking a weapon still requires current observations.
-- Zone: current/next circles, future-circle queries and danger at an estimated arrival time.
-- Projectiles: swept paths catch fast bullets crossing between old sample points. Mortar paths use gravity and conservative splash estimates.
-- Cover: solids reduce weapon exposure. Trees do not count as bullet cover. Four new cover rays per decision bound the work; unchecked clearance stays dangerous. Cover terrain rays use up to 12 samples; firing and collision checks retain their finer sampling.
-
-The navigator rechecks route danger on map changes and periodically while moving. More dangerous routes restart their bounded search. Partial route steps are retained for inspection. The bot does not know hidden spawns, unseen global opponents or NPC homes.
-
-Snapshots copy their data, so later updates cannot alter saved history. Knowledge, resource memory, branches, heat cells, route search and geometry caches are bounded.
-
-## Inspect the map
-
-Open reports/virtual_map.html in a browser. It works offline, with a timeline, pan/zoom, follow camera and nine layer toggles. It shows the actual recorded observations together with our estimates and decisions. Those observations do not react to bot actions.
-
-To rebuild it:
-
-~~~sh
-python3 tools/export_map_viewer.py
-~~~
-
-If the kit is outside this folder, set MECHFIGHT_KIT to the kit root containing protocol.md, arena/ and check/. All test/viewer helpers honor it. This keeps development downloads out of a browser-upload folder.
-
-Optional protocol debug drawings are enabled with MECH_DEBUG_MAP=1. They show capped routes, actor positions and predictions inside normal action messages. This mode makes no network calls or file writes; it stays off by default.
-
-The viewer and model checks cover fast/vertical projectiles, solid cover versus trees, live memory settings, multiple hypotheses, zone forecasts, resource expiry, snapshot independence, caps, changed routes and finer-grid retries. Browser render, timeline, layer and camera checks are recorded in reports/viewer_check.json.
-
-## Strategy
-
-Enemy memory belongs only to observed mech IDs. Predictions fade, uncertainty grows, and predicted motion stops at map obstacles. Sound creates a broad risk area, not an invented enemy location. Damage updates aggression only when the event identifies an attacker.
-
-Observed NPC drones have their own bounded memory. Their proximity and recent attacks affect route danger using the official aggro/chase ranges. Their hidden spawn/home positions are never guessed, and the bot does not farm drones.
-
-Survival and zone movement override loot and risky attacks. Clear, aimed gun shots can continue while dodging, retreating or moving out of the zone. New laser charges and mortar attacks remain blocked while escape takes priority. Target and destination choices have short holding periods to reduce switching. Visible cubes, weapons and uncontested landed drops can be gathered when the route is safe.
-
-Gun aim uses one intercept calculation. Mortars use gravity and a checked arc; lasers charge and release correctly. Shots must agree with actual torso aim and pass 3D obstruction checks. Inferred tracks are not fired upon.
-
-## Run the checks
-
-Python 3.9+ is needed for development. No third-party runtime packages are required. From this project root, first download the official kit if work/official-kit is absent:
-
-~~~sh
+```sh
 python3 tools/fetch_official_kit.py
 python3 -m unittest discover -s tests -v
 python3 tests/strictness_runner.py --all --seed 17 --seed 29
 python3 tools/check_official.py --sample
 python3 tools/check_official.py
-~~~
+```
 
-On Windows, use python instead of python3. The kit fetcher refuses to overwrite an existing kit. The downloaded kit was compared with a fresh official download on 2026-11-22; its SHA-256 is recorded in reports/map_coverage.json.
+If the kit is already elsewhere, skip the download and set `MECHFIGHT_KIT` to its root, which contains `protocol.md`, `check/` and `arena/`. On Windows use `python`, and for example:
 
-There are exactly five synthetic test levels. Fixtures are checked against the official schema. Level 5 also runs all 300 recorded observations, full-map loading, airborne states and larger threat inputs. Latency is measured without allocation tracing; a separate pass measures allocations. Timing and behavior failures are separate release gates.
+```powershell
+$env:MECHFIGHT_KIT='C:\Users\ayode\machina\mech-royale-upload-backup-20261122-030550\work\official-kit\mechfight-kit'
+$env:PYTHONDONTWRITEBYTECODE='1'
+python -B -m unittest discover -s tests -v
+```
 
-The official checker tests protocol and response times. Its recorded world does not react to our actions. Neither it nor the synthetic suite proves a match result or placement score.
+There are exactly five levels. Select one with `--level 1` through `--level 5`; `--all` runs all five. Levels change test inputs, never live policy or safety rules. Level 5 includes 4,801 synthetic decisions over 480 seconds plus all 300 official recorded observations, with different legal initial ground positions for each seed. Synthetic sequences are scripted inputs, not a physics simulator.
 
-## Docker and VM checks
+Tests validate observations and actions against the official schema and check uncertainty, pursuit, energy reserve, recovery, zone priority, reload, crowds, stationary attacks, misleading history, encounter outcomes, stuck recovery, mode switching and bounded history. Timing excludes allocation tracing; allocation checks run separately.
 
-The Dockerfile follows the official Python Dockerfile, pins the base image by digest, and copies only the six runtime modules. It does not bundle the map. On Linux with Docker:
+## Build and test on Linux AMD64
 
-~~~sh
-sudo docker build --platform linux/amd64 -t mech-agent:map-aware .
-python3 tools/check_official.py --image mech-agent:map-aware
-python3 tools/measure_sandbox.py --image mech-agent:map-aware
-~~~
+Docker setup tested on the separate Ubuntu 24.04 AMD64 validation VM:
 
-The checker helper invokes the unchanged official checker with no network, 1 CPU, 512 MB memory, read-only root, user 65534, writable /tmp of 64 MB, and the official arena mounted read-only at /arena. The measurement helper separately records in-container peak RSS.
+```sh
+sudo apt-get update
+sudo apt-get -o DPkg::Lock::Timeout=180 install -y docker.io
+sudo systemctl start docker
+export PYTHONDONTWRITEBYTECODE=1
+export MECHFIGHT_KIT="$PWD/kit/mechfight-kit"
+sudo docker build --platform linux/amd64 --no-cache -t mech-agent:roadmap .
+python3 tools/validate_sandbox.py --image mech-agent:roadmap --reports-dir reports/roadmap-amd64
+python3 tools/check_official.py --image mech-agent:roadmap --reports-dir reports/roadmap-amd64
+python3 tools/measure_sandbox.py --image mech-agent:roadmap --reports-dir reports/roadmap-amd64
+```
 
-The existing Google Cloud VM is Debian 12 on ARM64, not Ubuntu/AMD64. Its separate bot project is /home/ayode/mech-royale. Docker and AMD64 emulation were installed there. Native ARM timing and emulated AMD64 sandbox timing are reported separately; emulation is not a prediction of competition-host speed.
+For a fresh checkout the fetcher instead places the kit in `work/official-kit/mechfight-kit`; use that path for `MECHFIGHT_KIT`.
 
-Reports:
-- reports/test_matrix.md: workstation five-level results on seeds 17 and 29.
-- reports/official-native.json: workstation official checker output and exact command.
-- reports/map_coverage.json: loaded map coverage and source hashes.
-- reports/map-foundation-vm/: current VM unit tests, five-level runs, official native/Docker checks and sandbox memory. reports/vm/ preserves the earlier version.
+The pinned Python image copies only runtime files. The map is mounted separately. The sandbox harness imports runtime code from the built image at `/bot` and mounts its test harness and kit read-only. It uses exactly 1 CPU, 512 MB, no network, read-only root, uid 65534 and a 64 MB `/tmp`. No writable source mount is used. All five levels, two seeds and unit tests run inside those limits. The unchanged official checker is a separate release gate and is repeated three times on the final image.
 
-The latest measured results are summarized in reports/validation_summary.json. All timings are measurements on the named host, not match scores.
+The original ARM64 dataset VM is separate. Native AMD64 measurements are saved under `reports/roadmap-amd64/`; earlier ARM and emulation reports describe older versions. The Machina dataset jobs remain stopped.
 
-## Public repository and next step
+## Evidence and limits
 
-The runtime entrypoint and Dockerfile are at the repository root. work/, outputs/ and bytecode caches are excluded from Git. The map and downloaded kit are development inputs; the runtime uses the read-only mounted map.
+Current release evidence is summarized in `reports/validation_summary.json`, `reports/roadmap_completion.json` and `reports/test_matrix.md`. Raw reports include source hashes, exact commands, build duration, process memory, behavior assertions and checker output. All five levels and the unchanged official checker must pass before release.
 
-No repository has been published and no tournament submission has been made. The next useful strategy test is a real practice match: record placement, zone deaths, stuck time and encounter outcomes, then tune from those results. The kit has no reactive local match simulator.
+Tests cannot predict placement. The kit's recorded observations do not react to our actions. Even an end message in that recording is fixture data, not our match result. The user reported practice scores of 0.25 and 0.96; the 0.96 receipt and commit are unknown. This roadmap version needs its own real scored run.
 
-Official sources: [challenge](https://www.joinbuilders.org/buildathon/tracks/builders), [protocol](https://www.joinbuilders.org/buildathon/tracks/builders/files/protocol.md?inline=1), [kit](https://www.joinbuilders.org/buildathon/tracks/builders/files/mechfight-kit.tar.gz).
+Routes, cover rays, weapon estimates, behavior tendencies and air movement are bounded planning approximations. Narrow passages and long searches may be missed. Unknown enemy equipment/health uses cautious defaults. Branch weights and fight estimates are not measured probabilities. The server controls the actual physics and outcome.
 
-## First practice result and defensive-fire fix
+## Policy and diagnostics
 
-The user reported score 0.25 for receipt BB-E16EF5BF at commit 38c5e47a7505. This is about 15.75th place on average under the placement formula. The displayed wait 95 ms is queue_wait_ms in the public result UI; it is not bot action latency. No replay or per-match trace was supplied.
+`MECH_POLICY=survival` is the default; `balanced` and `cautious` are separate tuning presets. `MECH_POLICY_FILE` can point to a readable JSON file with named `Policy` fields. Values are checked at startup. These settings are independent of the five test levels.
 
-Code review confirmed that the submitted version suppressed every weapon whenever the bot was weak, dodging or urgently moving into the zone. That also disabled safe gun self-defense. The new version permits aligned, in-range, clear gun/energy-reserved lightning shots while preserving escape movement. It still blocks inferred-target fire, new slowing laser charges and risky mortar attacks under pressure. Current sensor targets take priority over extrapolated tracks. The gun trigger stays held through cooldown when a shot is otherwise valid, letting the server fire at its actual ready tick. Expensive sight checks run only after a weapon is aimed well enough to fire. Collision-checked movement also continues while an incremental route is being computed.
+`MECH_DEBUG_MAP=1` adds capped drawings. `MECH_TELEMETRY_STDERR=0` disables the compact end summary. Optional `MECH_TELEMETRY_FILE=/tmp/match.json` saves a fuller bounded summary; other output paths are rejected. No runtime network or default file writes are used.
 
-The pressure tests now explicitly check shooting while dodging, low-health retreat, zone escape, energy reserves and stale-target rejection. This correction has no new scored match result yet. Compare a new practice score with 0.25 before claiming a placement improvement. Current validation is saved in reports/defensive-combat/ and reports/defensive-combat-vm/.
+The offline viewer is `reports/virtual_map.html`. Rebuild with `python3 tools/export_map_viewer.py`. It shows recorded observations and estimates, with timeline, camera and layer controls.
+
+## Practice and release
+
+Repository: https://github.com/fikayoAy/mech-royale-bot . Keep `Dockerfile` at the root. Development downloads, outputs and bytecode caches are excluded. Release tooling checks the 20 MB tracked-file limit; the runtime does not bundle the public map.
+
+Submit the repository URL on the official challenge page after approval. The roadmap explicitly says not to automate tournament submissions without approval. No submission is triggered by any script here. After a real score arrives, record its exact commit and receipt:
+
+```sh
+python3 tools/record_practice.py --score 0.96 --commit ACTUAL_COMMIT --receipt ACTUAL_RECEIPT --notes "real result"
+```
+
+Those arguments are an example, not a recorded score for this version. Keep the best known scored commit. Use actual stuck/zone/encounter traces to choose the next change; a lower score alone does not identify a cause.
+
+Official sources: [challenge](https://www.joinbuilders.org/buildathon/tracks/builders), [protocol](https://www.joinbuilders.org/buildathon/tracks/builders/files/protocol.md?inline=1), [kit](https://www.joinbuilders.org/buildathon/tracks/builders/files/mechfight-kit.tar.gz). Rules were checked on 2026-11-22.

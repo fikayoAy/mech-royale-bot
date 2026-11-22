@@ -1,0 +1,352 @@
+{
+  "level": 5,
+  "name": "Tournament-grade stress",
+  "runs": [
+    {
+      "level": 5,
+      "name": "Tournament-grade stress",
+      "seed": 17,
+      "actions": 5101,
+      "invalid_actions": 0,
+      "missed_ticks": 0,
+      "exceptions": [],
+      "latency_ms": {
+        "median": 8.113235,
+        "p95": 9.491448,
+        "p99": 10.173376,
+        "max": 14.733762
+      },
+      "late_actions": 0,
+      "peak_python_bytes": 9081177,
+      "process_peak_rss_bytes": 73940992,
+      "memory_note": "process lifetime peak; allocation sample is separate from latency",
+      "safety_rule_violations": [],
+      "assertion_failures": [],
+      "timing_failures": [],
+      "behavior_checks": [
+        {
+          "scenario": "encounter and latency histories stay bounded",
+          "passed": true
+        },
+        {
+          "scenario": "telemetry includes measured outcomes",
+          "passed": true
+        }
+      ],
+      "synthetic_match_seconds": 480.0,
+      "initial_spawn": [
+        -477.6430305179658,
+        377.6790886018943,
+        -6.748417972949812
+      ],
+      "policy": {
+        "name": "survival",
+        "weak_enter": 0.42,
+        "recovery_exit": 0.72,
+        "danger_enter": 0.9,
+        "danger_exit": 0.55,
+        "engage_advantage": 1.15,
+        "mode_hold_s": 0.8,
+        "target_hold_s": 1.0,
+        "target_switch_ratio": 0.8,
+        "goal_hold_s": 2.0,
+        "goal_risk_weight": 65.0,
+        "support_radius": 70.0,
+        "support_weight": 0.55,
+        "behavior_half_life_s": 12.0,
+        "encounter_gap_s": 6.0,
+        "boost_start_fraction": 0.55,
+        "boost_stop_fraction": 0.25,
+        "escape_reserve": 8.0,
+        "pursuit_radius": 120.0,
+        "preferred_range": 70.0,
+        "reload_fraction": 0.4,
+        "loot_radius": 45.0,
+        "scan_period_s": 4.0,
+        "navigation_budget_ms": 0.6,
+        "decision_budget_ms": 35.0,
+        "heat_decay": 0.4,
+        "cover_rays": 4,
+        "max_tracks": 15,
+        "max_heat_cells": 256,
+        "max_encounters_kept": 16
+      },
+      "mode_transitions": 2555,
+      "telemetry": {
+        "schema": "mech-match-summary/1",
+        "actions": 4801,
+        "errors": 0,
+        "mode_counts": {
+          "evade": 2706,
+          "disengage": 2095
+        },
+        "decision_ms": {
+          "p50_recent": 8.221693999985291,
+          "p95_recent": 9.63472700004786,
+          "p99_recent": 10.470582000152717,
+          "max": 14.714891000039643,
+          "late": 0
+        },
+        "stuck_seconds": 411.49999999999994,
+        "zone_seconds": 0.0,
+        "zone_damage": 0.0,
+        "weapon_damage_received": 86490.0,
+        "damage_dealt": 0.0,
+        "ammo_spent": 0,
+        "firing_actions": 8,
+        "budget_fallbacks": 0,
+        "policy": {
+          "name": "survival",
+          "weak_enter": 0.42,
+          "recovery_exit": 0.72,
+          "danger_enter": 0.9,
+          "danger_exit": 0.55,
+          "engage_advantage": 1.15,
+          "mode_hold_s": 0.8,
+          "target_hold_s": 1.0,
+          "target_switch_ratio": 0.8,
+          "goal_hold_s": 2.0,
+          "goal_risk_weight": 65.0,
+          "support_radius": 70.0,
+          "support_weight": 0.55,
+          "behavior_half_life_s": 12.0,
+          "encounter_gap_s": 6.0,
+          "boost_start_fraction": 0.55,
+          "boost_stop_fraction": 0.25,
+          "escape_reserve": 8.0,
+          "pursuit_radius": 120.0,
+          "preferred_range": 70.0,
+          "reload_fraction": 0.4,
+          "loot_radius": 45.0,
+          "scan_period_s": 4.0,
+          "navigation_budget_ms": 0.6,
+          "decision_budget_ms": 35.0,
+          "heat_decay": 0.4,
+          "cover_rays": 4,
+          "max_tracks": 15,
+          "max_heat_cells": 256,
+          "max_encounters_kept": 16
+        },
+        "encounters": {
+          "closed": 0,
+          "kills": 0,
+          "contacts_escaped": 0,
+          "eliminated_after_contact": 0,
+          "damage_dealt": 0.0,
+          "damage_received": 86490.0,
+          "active": 15,
+          "recent": [],
+          "escape_definition": "No sensed or attributed contact for the configured gap while still alive; not proof the enemy stopped chasing.",
+          "loss_definition": "Non-winning end while contact remained active; does not identify who killed us."
+        },
+        "prediction_metrics": {
+          "prediction_samples": 129600,
+          "prediction_error_sum": 27030237.433795154,
+          "stuck_replans": 1371,
+          "map_updates": 4801,
+          "projectile_threats": 3873,
+          "cover_queries": 19204
+        },
+        "end": null,
+        "latency_sample_cap": 1024,
+        "score_source": "end message; recorded fixtures are not genuine match results",
+        "score": null
+      },
+      "map": {
+        "prisms": 259,
+        "trees": 1560,
+        "terrain_samples": 774680,
+        "bounds": {
+          "minX": -512.38,
+          "maxX": 555.08,
+          "minY": -333.09,
+          "maxY": 388.64
+        },
+        "load_error": null,
+        "scenery_sections": [
+          "blocks",
+          "stadium",
+          "cars",
+          "parking",
+          "water",
+          "barriers",
+          "stats"
+        ]
+      },
+      "note": "Synthetic/recorded implementation checks only; no gameplay or placement result. Official Docker checker is a separate gate."
+    },
+    {
+      "level": 5,
+      "name": "Tournament-grade stress",
+      "seed": 29,
+      "actions": 5101,
+      "invalid_actions": 0,
+      "missed_ticks": 0,
+      "exceptions": [],
+      "latency_ms": {
+        "median": 11.339995,
+        "p95": 13.192285,
+        "p99": 14.053582,
+        "max": 18.221662
+      },
+      "late_actions": 0,
+      "peak_python_bytes": 9081177,
+      "process_peak_rss_bytes": 75673600,
+      "memory_note": "process lifetime peak; allocation sample is separate from latency",
+      "safety_rule_violations": [],
+      "assertion_failures": [],
+      "timing_failures": [],
+      "behavior_checks": [
+        {
+          "scenario": "encounter and latency histories stay bounded",
+          "passed": true
+        },
+        {
+          "scenario": "telemetry includes measured outcomes",
+          "passed": true
+        }
+      ],
+      "synthetic_match_seconds": 480.0,
+      "initial_spawn": [
+        421.6751000623402,
+        -67.1720148677976,
+        2.0117818525688285
+      ],
+      "policy": {
+        "name": "survival",
+        "weak_enter": 0.42,
+        "recovery_exit": 0.72,
+        "danger_enter": 0.9,
+        "danger_exit": 0.55,
+        "engage_advantage": 1.15,
+        "mode_hold_s": 0.8,
+        "target_hold_s": 1.0,
+        "target_switch_ratio": 0.8,
+        "goal_hold_s": 2.0,
+        "goal_risk_weight": 65.0,
+        "support_radius": 70.0,
+        "support_weight": 0.55,
+        "behavior_half_life_s": 12.0,
+        "encounter_gap_s": 6.0,
+        "boost_start_fraction": 0.55,
+        "boost_stop_fraction": 0.25,
+        "escape_reserve": 8.0,
+        "pursuit_radius": 120.0,
+        "preferred_range": 70.0,
+        "reload_fraction": 0.4,
+        "loot_radius": 45.0,
+        "scan_period_s": 4.0,
+        "navigation_budget_ms": 0.6,
+        "decision_budget_ms": 35.0,
+        "heat_decay": 0.4,
+        "cover_rays": 4,
+        "max_tracks": 15,
+        "max_heat_cells": 256,
+        "max_encounters_kept": 16
+      },
+      "mode_transitions": 2482,
+      "telemetry": {
+        "schema": "mech-match-summary/1",
+        "actions": 4801,
+        "errors": 0,
+        "mode_counts": {
+          "disengage": 2083,
+          "evade": 2718
+        },
+        "decision_ms": {
+          "p50_recent": 11.47139599993352,
+          "p95_recent": 13.260511999988012,
+          "p99_recent": 13.994216999890341,
+          "max": 18.19711100006316,
+          "late": 0
+        },
+        "stuck_seconds": 411.49999999999994,
+        "zone_seconds": 0.0,
+        "zone_damage": 0.0,
+        "weapon_damage_received": 86490.0,
+        "damage_dealt": 0.0,
+        "ammo_spent": 0,
+        "firing_actions": 9,
+        "budget_fallbacks": 0,
+        "policy": {
+          "name": "survival",
+          "weak_enter": 0.42,
+          "recovery_exit": 0.72,
+          "danger_enter": 0.9,
+          "danger_exit": 0.55,
+          "engage_advantage": 1.15,
+          "mode_hold_s": 0.8,
+          "target_hold_s": 1.0,
+          "target_switch_ratio": 0.8,
+          "goal_hold_s": 2.0,
+          "goal_risk_weight": 65.0,
+          "support_radius": 70.0,
+          "support_weight": 0.55,
+          "behavior_half_life_s": 12.0,
+          "encounter_gap_s": 6.0,
+          "boost_start_fraction": 0.55,
+          "boost_stop_fraction": 0.25,
+          "escape_reserve": 8.0,
+          "pursuit_radius": 120.0,
+          "preferred_range": 70.0,
+          "reload_fraction": 0.4,
+          "loot_radius": 45.0,
+          "scan_period_s": 4.0,
+          "navigation_budget_ms": 0.6,
+          "decision_budget_ms": 35.0,
+          "heat_decay": 0.4,
+          "cover_rays": 4,
+          "max_tracks": 15,
+          "max_heat_cells": 256,
+          "max_encounters_kept": 16
+        },
+        "encounters": {
+          "closed": 0,
+          "kills": 0,
+          "contacts_escaped": 0,
+          "eliminated_after_contact": 0,
+          "damage_dealt": 0.0,
+          "damage_received": 86490.0,
+          "active": 15,
+          "recent": [],
+          "escape_definition": "No sensed or attributed contact for the configured gap while still alive; not proof the enemy stopped chasing.",
+          "loss_definition": "Non-winning end while contact remained active; does not identify who killed us."
+        },
+        "prediction_metrics": {
+          "prediction_samples": 129600,
+          "prediction_error_sum": 27010468.720121138,
+          "stuck_replans": 1371,
+          "map_updates": 4801,
+          "projectile_threats": 3786,
+          "cover_queries": 19204
+        },
+        "end": null,
+        "latency_sample_cap": 1024,
+        "score_source": "end message; recorded fixtures are not genuine match results",
+        "score": null
+      },
+      "map": {
+        "prisms": 259,
+        "trees": 1560,
+        "terrain_samples": 774680,
+        "bounds": {
+          "minX": -512.38,
+          "maxX": 555.08,
+          "minY": -333.09,
+          "maxY": 388.64
+        },
+        "load_error": null,
+        "scenery_sections": [
+          "blocks",
+          "stadium",
+          "cars",
+          "parking",
+          "water",
+          "barriers",
+          "stats"
+        ]
+      },
+      "note": "Synthetic/recorded implementation checks only; no gameplay or placement result. Official Docker checker is a separate gate."
+    }
+  ]
+}
