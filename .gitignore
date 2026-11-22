@@ -1,0 +1,7 @@
+work/
+outputs/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+reports/vm-*/
+count_video_samples.py
