@@ -1,0 +1,14 @@
+{
+  "passed": true,
+  "frames": 30,
+  "layers": 9,
+  "checks": [
+    "initial render",
+    "timeline",
+    "follow camera",
+    "danger toggle",
+    "fit camera",
+    "screenshots"
+  ],
+  "browser_errors": []
+}

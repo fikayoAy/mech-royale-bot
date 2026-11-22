@@ -1,0 +1,19 @@
+{
+  "captured_utc": "2026-11-22T02:54:29.994869+00:00",
+  "host_system": "Linux-6.1.0-56-cloud-arm64-aarch64-with-glibc2.36",
+  "host_architecture": "aarch64",
+  "python": "3.11.2",
+  "command": [
+    "/usr/bin/python3",
+    "/home/ayode/mech-royale/work/official-kit/mechfight-kit/check/check.py",
+    "--",
+    "/usr/bin/python3",
+    "-u",
+    "/home/ayode/mech-royale/work/official-kit/mechfight-kit/python/example_bot.py"
+  ],
+  "exit_code": 0,
+  "elapsed_seconds": 0.14909866000016336,
+  "stdout": "bot: /usr/bin/python3 -u /home/ayode/mech-royale/work/official-kit/mechfight-kit/python/example_bot.py\nready in 20 ms: name 'example-py'\nobservations: 300  answered in time: 300  missed the 50 ms budget: 0 (0 came late)\nanswer time ms: p50 0.3  p90 0.3  p99 0.3  max 0.4  (this machine, not the 1-CPU match container)\nanswers to older queued observations (dropped): 0  wrong tick: 0  bad lines: 0  debug drawings: 300 (0 over the caps)\nPASS\n",
+  "stderr": "",
+  "note": "Conformance/timing on recorded observations. No match or placement result. AMD64 on an ARM host uses emulation."
+}

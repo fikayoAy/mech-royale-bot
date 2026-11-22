@@ -9,9 +9,10 @@ class Navigator:
         self.arena=arena;self.cell=cell
         self.route=[];self.search=None;self.signature=None;self.edges={}
         self.stats={};self.stats_key=None;self.last_expansions=0;self.status='idle'
+        self.route_risks={};self.checked_revision=None;self.checked_at=-1.;self.replans=0;self.base_cell=cell;self.refined=False
 
     def invalidate(self):
-        self.route=[];self.search=None;self.signature=None
+        self.route=[];self.search=None;self.signature=None;self.route_risks={}
 
     def configure(self,stats):
         key=tuple(stats.get(k,d) for k,d in [('radius',2.5),('height',9.),('step_up',1.2),('max_slope_deg',50.)])
@@ -48,16 +49,38 @@ class Navigator:
         self.edges[node]=result
         return result
 
-    def waypoint(self,start,goal,risk=None,now=0.,budget_ms=.8):
+    def _route_costs(self,risk):
+        points=self.route[:12]+(self.route[-1:] if len(self.route)>12 else [])
+        self.route_risks={tuple(q):risk(q) for q in points}
+
+    def waypoint(self,*args,**kwargs):
+        point=self._waypoint(*args,**kwargs)
+        self.last_waypoint=point
+        return point
+
+    def _waypoint(self,start,goal,risk=None,now=0.,budget_ms=.6,revision=None):
         risk=risk or (lambda p:0.)
         self.last_expansions=0
         deadline=time.perf_counter()+budget_ms/1000
         goal=list(goal)
+        if self.route and (revision!=self.checked_revision or now-self.checked_at>=.5):
+            # Recheck a bounded prefix and destination under the latest threat map.
+            changed=False
+            for q in self.route[:8]+self.route[-1:]:
+                danger=risk(q);old=self.route_risks.get(tuple(q),0.)
+                if danger>old+.3 and danger>.45:changed=True;break
+            self.checked_revision=revision;self.checked_at=now
+            if changed:
+                self.invalidate();self.replans+=1;self.status='danger_changed'
+        if self.search and revision!=self.search.get('revision') and now-self.search['started']>1.:
+            if risk(self._point(self.search['best']))>max(.7,risk(start)+.3):
+                self.search=None;self.replans+=1
         if math.dist(start[:2],goal[:2])<18:
             direct=self.arena.walk_segment(start,goal,self.stats)
-            if direct:
+            midpoint=[(start[j]+direct[j])*.5 for j in range(3)] if direct else None
+            if direct and (len(goal)<3 or abs(direct[2]-goal[2])<.3) and max(risk(midpoint),risk(direct))<=max(.35,risk(start)+.3):
                 self.route=[];self.status='direct';return direct
-        sig=(round(goal[0]/self.cell),round(goal[1]/self.cell))
+        sig=(round(goal[0]/self.cell),round(goal[1]/self.cell),round(goal[2],1) if len(goal)>2 else None)
         if sig!=self.signature:
             self.route=[];self.search=None;self.signature=sig
         while self.route and math.dist(start[:2],self.route[0][:2])<3.:self.route.pop(0)
@@ -70,7 +93,7 @@ class Navigator:
             if anchor is None:
                 self.status='no_anchor';return list(start)
             self.search={'open':[(0.,anchor)],'g':{anchor:0.},'parent':{},'closed':set(),
-                         'root':anchor,'started':now,'best':anchor,'best_h':float('inf')}
+                         'root':anchor,'started':now,'revision':revision,'best':anchor,'best_h':float('inf')}
         s=self.search
         while s['open'] and self.last_expansions<96 and time.perf_counter()<deadline:
             _,node=heapq.heappop(s['open'])
@@ -78,13 +101,14 @@ class Navigator:
             s['closed'].add(node);self.last_expansions+=1
             p=self._point(node);h=math.dist(p[:2],goal[:2])
             if h<s['best_h']:s['best'],s['best_h']=node,h
-            if h<self.cell*1.6 and self.arena.walk_segment(p,goal,self.stats):
+            if h<self.cell*1.6 and self.arena.walk_segment(p,goal,self.stats) and (len(goal)<3 or abs(self.arena.walk_segment(p,goal,self.stats)[2]-goal[2])<.3):
                 end=self.arena.walk_segment(p,goal,self.stats)
                 route=[end]
                 while node!=s['root']:
                     route.append(self._point(node));node=s['parent'][node]
                 route.append(self._point(s['root']));route.reverse()
                 self.route=route;self.search=None;self.status='route_found'
+                self._route_costs(risk);self.checked_revision=revision;self.checked_at=now
                 while self.route and math.dist(start[:2],self.route[0][:2])<3.:self.route.pop(0)
                 return self.route[0] if self.route else list(start)
             if len(s['closed'])>=12000:
@@ -96,6 +120,10 @@ class Navigator:
                     s['g'][other]=cost;s['parent'][other]=node
                     heapq.heappush(s['open'],(cost+math.dist(self._point(other)[:2],goal[:2])*1.05,other))
         self.status='searching' if s['open'] else 'no_route'
+        if not s['open'] and not self.refined and self.cell>3.:
+            # Retry a coarse-grid failure with a finer local representation.
+            self.cell=3.;self.refined=True;self.edges.clear();self.invalidate()
+            self.status='refining';return list(start)
         node=s['best'];prefix=[]
         while node!=s['root']:
             prefix.append(self._point(node));node=s['parent'][node]

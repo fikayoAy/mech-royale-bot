@@ -1,0 +1,56 @@
+{
+  "uid": 65534,
+  "observations": 300,
+  "peak_rss_bytes": 67461120,
+  "p50_ms": 9.855195,
+  "p99_ms": 38.98026,
+  "map": {
+    "prisms": 259,
+    "trees": 1560,
+    "terrain_samples": 774680,
+    "bounds": {
+      "minX": -512.38,
+      "maxX": 555.08,
+      "minY": -333.09,
+      "maxY": 388.64
+    },
+    "load_error": null,
+    "scenery_sections": [
+      "blocks",
+      "stadium",
+      "cars",
+      "parking",
+      "water",
+      "barriers",
+      "stats"
+    ]
+  },
+  "note": "Recorded workload under the sandbox, not a match. Peak RSS includes map/model.",
+  "command": [
+    "sudo",
+    "docker",
+    "run",
+    "--rm",
+    "-i",
+    "--platform",
+    "linux/amd64",
+    "--network",
+    "none",
+    "--cpus",
+    "1",
+    "--memory",
+    "512m",
+    "--read-only",
+    "--tmpfs",
+    "/tmp:rw,size=64m",
+    "--user",
+    "65534:65534",
+    "-v",
+    "/home/ayode/mech-royale/work/official-kit/mechfight-kit/arena:/arena:ro",
+    "--entrypoint",
+    "python3",
+    "mech-agent:map-aware",
+    "-c",
+    "\nimport json,sys,os,resource,time,statistics\nfrom bot import Bot\nmessages=[json.loads(line) for line in sys.stdin if line.strip()]\nhello=messages[0];hello['map']['dir']='/arena'\nbot=Bot(hello);times=[]\nfor obs in messages:\n if obs.get('type')!='obs':continue\n start=time.perf_counter_ns();bot.decide(obs);times.append((time.perf_counter_ns()-start)/1e6)\nout={'uid':os.getuid(),'observations':len(times),'peak_rss_bytes':resource.getrusage(resource.RUSAGE_SELF).ru_maxrss*1024,\n     'p50_ms':statistics.median(times),'p99_ms':sorted(times)[int(len(times)*.99)],'map':bot.arena.summary(),\n     'note':'Recorded workload under the sandbox, not a match. Peak RSS includes map/model.'}\nprint(json.dumps(out))\n"
+  ]
+}

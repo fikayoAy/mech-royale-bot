@@ -1,0 +1,54 @@
+{
+  "level": 4,
+  "name": "Adversarial scenarios",
+  "runs": [
+    {
+      "level": 4,
+      "name": "Adversarial scenarios",
+      "seed": 17,
+      "actions": 200,
+      "invalid_actions": 0,
+      "missed_ticks": 0,
+      "exceptions": [],
+      "latency_ms": {
+        "median": 1.9888,
+        "p95": 3.7617,
+        "p99": 3.7935,
+        "max": 3.82409
+      },
+      "late_actions": 0,
+      "peak_python_bytes": 430376,
+      "process_peak_rss_bytes": 19595264,
+      "memory_note": "process lifetime peak; allocation sample is separate from latency",
+      "safety_rule_violations": [],
+      "assertion_failures": [],
+      "timing_failures": [],
+      "map": null,
+      "note": "Synthetic/recorded implementation checks only; no gameplay or placement result. Official Docker checker is a separate gate."
+    },
+    {
+      "level": 4,
+      "name": "Adversarial scenarios",
+      "seed": 29,
+      "actions": 200,
+      "invalid_actions": 0,
+      "missed_ticks": 0,
+      "exceptions": [],
+      "latency_ms": {
+        "median": 1.996035,
+        "p95": 3.76222,
+        "p99": 3.80257,
+        "max": 3.82045
+      },
+      "late_actions": 0,
+      "peak_python_bytes": 430272,
+      "process_peak_rss_bytes": 64331776,
+      "memory_note": "process lifetime peak; allocation sample is separate from latency",
+      "safety_rule_violations": [],
+      "assertion_failures": [],
+      "timing_failures": [],
+      "map": null,
+      "note": "Synthetic/recorded implementation checks only; no gameplay or placement result. Official Docker checker is a separate gate."
+    }
+  ]
+}

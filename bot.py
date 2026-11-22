@@ -1,9 +1,11 @@
 """Survival-first mechfight/1 agent. Runtime: Python standard library only."""
 import math
+import os
 import random
 import mechfight as mf
 from arena_map import ArenaMap
 from navigation import Navigator
+from virtual_map import VirtualMap
 
 
 def clamp(x,lo,hi):
@@ -42,99 +44,40 @@ class Bot:
         self.rng=random.Random(0);self.tracks={};self.npcs={};self.heat={}
         self.last_pos=None;self.stuck=0;self.last_move=[0.,0.]
         self.arena=ArenaMap();self.nav=Navigator(self.arena);self.config={}
+        self.stats=dict(DEFAULTS);self.world=VirtualMap(self.arena,self.config)
+        self.debug_map=os.environ.get('MECH_DEBUG_MAP')=='1';self.last_map_revision=-1
         self.goal=None;self.goal_until=0.;self.target_id=None;self.target_until=0.
         self.mode='observe';self.jet=None;self.predictions=[];self.last_now=0.;self.blocked=0
-        self.metrics={'prediction_samples':0,'prediction_error_sum':0.,'stuck_replans':0}
+        self.metrics=self.world.metrics
         if hello:self.hello(hello)
 
     def hello(self,m):
         self.rng.seed(int(m.get('seed',0) or 0))
         self.config=m.get('config',{}) if isinstance(m.get('config'),dict) else {}
+        self.world.config=self.config
         info=m.get('map',{}) if isinstance(m.get('map'),dict) else {}
         if info.get('dir'):
-            self.arena=ArenaMap.load(info['dir']);self.nav=Navigator(self.arena)
+            self.arena=ArenaMap.load(info['dir']);self.nav=Navigator(self.arena);self.world.arena=self.arena
             if self.arena.load_error:mf.log('Map unavailable:',self.arena.load_error)
 
     def act(self,o):
         return self.decide(o)
 
     def predict(self,t,now):
-        age=max(0.,now-t['seen']);horizon=min(age,1.5)
-        q=[t['pos'][j]+t['vel'][j]*horizon for j in range(3)]
-        uncertainty=2.+age*(4.+math.hypot(*t['vel'][:2])*.4)
-        # Extrapolation cannot claim motion through solid terrain/buildings.
-        if self.arena.walk_segment(t['pos'],q,self.stats,max_drop=8.) is None:q=t['pos'][:]
-        return q,max(0.,1-age/5.),uncertainty
+        self.world.arena=self.arena;self.world.stats=self.stats
+        return self.world.predict(t,now)
 
     def remember(self,o,now,p):
-        for actor in items(o,'mechs'):
-            eid=actor.get('id');kind=actor.get('kind','mech')
-            if not isinstance(eid,(int,float)) or eid==o.get('self',{}).get('id'):continue
-            if kind=='mech' and not 0<=eid<16:continue
-            memory=self.npcs if kind=='npc' else self.tracks
-            ep,ev=vec(actor.get('pos')),vec(actor.get('vel'));old=memory.get(eid)
-            ag=old['aggression'] if old else .5;evidence=old.get('evidence',0) if old else 0
-            if old:
-                dt=now-old['seen']
-                if .01<dt<2:
-                    error=dist(ep,[old['pos'][j]+old['vel'][j]*dt for j in range(3)])
-                    self.metrics['prediction_samples']+=1;self.metrics['prediction_error_sum']+=error
-                    approach=(p[0]-ep[0])*ev[0]+(p[1]-ep[1])*ev[1]
-                    if dist(ep,p)<120 and approach>dist(ep,p)*2:
-                        ag=ag*.92+.08;evidence+=1
-                    else:ag=ag*.98+.5*.02
-            memory[eid]={'pos':ep,'vel':ev,'seen':now,'hp':actor.get('hp'),
-                         'max_hp':actor.get('max_hp'),'weapons':actor.get('weapons',[]),
-                         'aggression':ag,'evidence':evidence,'damaged_us':old.get('damaged_us',-100.) if old else -100.}
-        self.tracks={i:t for i,t in self.tracks.items() if 0<=now-t['seen']<30}
-        self.npcs=dict(sorted(((i,t) for i,t in self.npcs.items() if 0<=now-t['seen']<8),
-                             key=lambda it:it[1]['seen'],reverse=True)[:32])
-        self.heat={k:(v[0]*math.exp(-max(0.,now-v[1])*.4),now) for k,v in self.heat.items()
-                   if v[0]*math.exp(-max(0.,now-v[1])*.4)>.03}
-        sound=self.config.get('sound',{})
-        for s in items(o,'sounds'):
-            if not isinstance(s.get('bearing'),(float,int)):continue
-            near=sound.get('near',60.);mid=sound.get('mid',160.)
-            band={'near':(8.,near),'mid':(near,mid),'far':(mid,sound.get('range',{}).get(s.get('kind'),320.))}.get(s.get('dist'),(near,mid))
-            if band[1]<band[0]:continue
-            weight=.35*math.exp(-clamp(s.get('age',0),0,10)*.4)
-            sigma=math.radians(sound.get('bearing_noise_deg',7.))
-            for fraction in (.25,.6,.9):
-                radius=band[0]+(band[1]-band[0])*fraction
-                for offset in (-sigma,0.,sigma):
-                    a=s['bearing']+offset;k=(round((p[0]+math.cos(a)*radius)/30),round((p[1]+math.sin(a)*radius)/30))
-                    self.heat[k]=(min(3.,self.heat.get(k,(0.,now))[0]+weight/3),now)
-        for beam in items(o,'beams'):
-            path=beam.get('path',[])
-            for q in path[:8]:
-                q=vec(q);k=(round(q[0]/30),round(q[1]/30))
-                self.heat[k]=(min(3.,self.heat.get(k,(0.,now))[0]+.5),now)
-        for ev in items(o,'events'):
-            if ev.get('type')=='damaged':
-                for memory in (self.tracks,self.npcs):
-                    if ev.get('by') in memory:
-                        t=memory[ev['by']];t['aggression']=min(1.,t['aggression']+.2)
-                        t['damaged_us']=now;t['evidence']+=2
-            if ev.get('type')=='kill':self.tracks.pop(ev.get('target'),None)
-        if len(self.heat)>256:self.heat=dict(sorted(self.heat.items(),key=lambda kv:kv[1][0],reverse=True)[:256])
-        self.predictions=[(i,*self.predict(t,now),t) for i,t in self.tracks.items() if now-t['seen']<5]
+        self.world.arena=self.arena;self.world.config=self.config
+        self.world.update(o,self.stats)
+        self.tracks=self.world.tracks;self.npcs=self.world.npcs;self.heat=self.world.heat
+        self.predictions=self.world.predictions
+        if self.world.revision!=self.last_map_revision:
+            if self.goal and self.world.risk(self.goal)>getattr(self,'goal_risk',0.)+.3:self.goal_until=0.
+            self.last_map_revision=self.world.revision
 
     def risk(self,q):
-        ix,iy=round(q[0]/30),round(q[1]/30);value=0.
-        for dx in (-1,0,1):
-            for dy in (-1,0,1):
-                k=(ix+dx,iy+dy);v=self.heat.get(k)
-                if v:value+=v[0]/(1+dist(q,[k[0]*30,k[1]*30])/20)
-        for _,p,confidence,uncertainty,t in self.predictions:
-            distance=max(0.,dist(q,p)-uncertainty)
-            value+=confidence*(.45+t['aggression']*.5)/(1+(distance/45)**2)
-        npc_cfg=self.config.get('npc',{})
-        for t in self.npcs.values():
-            age=self.last_now-t['seen'];reach=npc_cfg.get('aggro_range',45.)
-            if self.last_now-t['damaged_us']<5:reach=npc_cfg.get('deaggro_range',90.)
-            distance=dist(q,t['pos'])
-            if distance<reach+12:value+=max(0.,1-age/8)*1.8*(1-distance/(reach+12))
-        return value
+        return self.world.risk(q)
 
     def candidates(self,o,now,p):
         choices=[]
@@ -169,31 +112,30 @@ class Bot:
                 a=math.tau*i/16
                 options.append([center[0]+math.cos(a)*radius*fraction,center[1]+math.sin(a)*radius*fraction])
         options.append(p[:2])
-        ranked=[]
+        # Every risk term is nonnegative. Visit cheap distance lower bounds first
+        # and stop once no remaining candidate can beat the current best score.
+        ordered=[]
         for q in options:
             if dist(q,center)>max(0.,radius-5) and radius>5:continue
+            if not self.arena.in_bounds(q,self.stats['radius']):continue
+            lower=dist(p,q)*(.15 if not urgent else 1.)
+            if dist(q,center)>radius*.65:lower+=15
+            ordered.append((lower,q))
+        best=None
+        for lower,q in sorted(ordered,key=lambda x:x[0]):
+            if best is not None and lower>best[0]:break
             z=self.arena.surface(q[0],q[1],p[2]+self.stats.get('step_up',1.2))
-            if not self.arena.in_bounds(q,self.stats['radius']) or self.arena.solid_at([*q,z],self.stats['radius'],self.stats['height']):continue
-            score=dist(p,q)*(.15 if not urgent else 1.)+self.risk(q)*65
-            if dist(q,center)>radius*.65:score+=15
-            ranked.append((score,q))
-        self.goal=min(ranked,key=lambda x:x[0])[1] if ranked else list(center)
-        self.goal_until=now+2.
+            if self.arena.solid_at([*q,z],self.stats['radius'],self.stats['height']):continue
+            score=lower+self.risk(q)*65
+            if best is None or score<best[0]:best=(score,q)
+        self.goal=best[1] if best else list(center)
+        self.goal_until=now+2.;self.goal_risk=self.risk(self.goal)
         return self.goal
 
     def incoming(self,o,p,vel):
-        threats=[]
-        for shot in items(o,'projectiles')[:128]:
-            sp,sv=vec(shot.get('pos')),vec(shot.get('vel'))
-            gravity=self.config.get('weapons',{}).get('mortar',{}).get('gravity',22.) if shot.get('kind')=='mortar' else 0.
-            radius=self.config.get('weapons',{}).get('mortar',{}).get('splash_radius',7.) if gravity else 1.
-            for i in range(9):
-                t=i*.1
-                q=[sp[j]+sv[j]*t for j in range(3)];q[2]-=.5*gravity*t*t
-                own=[p[j]+vel[j]*min(t,.25) for j in range(3)]
-                if dist(own,q)<self.stats['radius']+radius+3 and own[2]-radius<q[2]<own[2]+self.stats['height']+radius:
-                    threats.append((q,sv));break
-        return threats
+        self.world.arena=self.arena;self.world.stats=self.stats
+        threats=self.world.projectile_threats(items(o,'projectiles'),p,vel)
+        return [(h['pos'],h['vel']) for h in threats]
 
     def decide(self,o):
         tick=int(o.get('tick',0) or 0);now=clamp(o.get('t',tick/20),0,1e7);self.last_now=now
@@ -213,7 +155,7 @@ class Bot:
         use_next=soon<max(30.,travel+10)
         safe_center,safe_radius=(nc,nr) if use_next else (center,radius)
         weak=clamp(me.get('hp',1400),0,1e6)/max(1.,clamp(me.get('max_hp',1400),1,1e6))<.42
-        threats=self.incoming(o,p,vel);danger=self.risk(p)>.9 or bool(threats)
+        threats=[(h['pos'],h['vel']) for h in self.world.hazards];danger=self.risk(p)>.9 or bool(threats)
         target=self.candidates(o,now,p)
         goal=self.safe_goal(p,safe_center,safe_radius,now,urgent)
         self.mode='zone_move' if urgent else 'disengage' if weak or danger else 'reposition'
@@ -235,7 +177,8 @@ class Bot:
         self.last_pos=p
         if self.stuck==5:
             self.nav.invalidate();self.metrics['stuck_replans']+=1
-        waypoint=self.nav.waypoint(p,goal,self.risk,now)
+        self.current_goal=list(goal)
+        waypoint=self.nav.waypoint(p,goal,self.risk,now,revision=self.world.revision)
         desired=[waypoint[0]-p[0],waypoint[1]-p[1]]
         if math.hypot(*desired)<.1 and self.nav.status in ('no_route','no_anchor'):
             desired=[goal[0]-p[0],goal[1]-p[1]]
@@ -284,6 +227,7 @@ class Bot:
         if choices:
             ranks={'armor':10,'plating':9,'nanites':8,'servos':7,'reactor':6,'jets':5,'capacitor':4,'sensors':3}
             action['pick']=max(range(min(3,len(choices))),key=lambda i:ranks.get(choices[i].get('id'),1))
+        if self.debug_map:action['debug']=self.world.debug_draw(self.nav.route or [getattr(self.nav,'last_waypoint',p)],goal,self.mode)
         return action
 
 

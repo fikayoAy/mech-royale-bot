@@ -184,7 +184,7 @@ class ArenaMap:
             if hit:return hit
         return None
 
-    def shot_clear(self,a,b):
+    def shot_clear(self,a,b,max_terrain_samples=None):
         """3D ray through solids and terrain. Trees never stop shots."""
         dx,dy,dz=b[0]-a[0],b[1]-a[1],b[2]-a[2]
         for ob in self._near(self._solids,a,b):
@@ -202,6 +202,7 @@ class ArenaMap:
                 t=(lo+hi)/2
                 if ob['base']-.001<=a[2]+dz*t<=ob['top']+.001 and self.contains(ob,(a[0]+dx*t,a[1]+dy*t)):return False
         steps=max(1,math.ceil(math.hypot(dx,dy)/1.5))
+        if max_terrain_samples is not None:steps=min(steps,max_terrain_samples)
         for i in range(1,steps):
             t=i/steps
             if a[2]+dz*t<self.ground(a[0]+dx*t,a[1]+dy*t)+.05:return False

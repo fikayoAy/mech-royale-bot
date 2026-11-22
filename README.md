@@ -16,7 +16,40 @@ Routes use several waypoints and continue searching across observations, with a 
 
 Air movement uses a short prediction with momentum, air acceleration, gravity, rise limits, jet fuel and landing checks. A blocked route can attempt an energy-limited jet escape after checking the overhead and lateral path.
 
-These are bounded planning checks, not a copy of the server's full physics engine. The 6 m route grid can miss narrow passages, long searches can run out of their node budget, and large drops are deliberately avoided. The bot cannot assume every rooftop is reachable with its remaining energy.
+These are bounded planning checks, not a copy of the server's full physics engine. Routes start on a 6 m grid and retry failed coarse searches on a 3 m grid. Narrow passages can still be missed, long searches can run out of their node budget, and large drops are deliberately avoided. The bot cannot assume every rooftop is reachable with its remaining energy.
+
+## Shared virtual map
+
+virtual_map.py is the shared source of changing battlefield knowledge. The bot uses it for danger, memory, projectile avoidance and route updates.
+
+- Static facts: the full public terrain, solids, holes, trees and bounds.
+- Sensed actors: only IDs present in official observations, including server-provided sensor memory.
+- Inferred actors: fading memory with straight, left, right and stationary movement possibilities. Every branch is checked against the map. Branch weights are planning hints, not measured probabilities.
+- Activity: fading sound areas and seen beam origins. Sounds never create an enemy ID or an exact enemy position.
+- Resources: bounded, time-stamped crate/cube/weapon memory. Sensed and inferred resources are labeled separately; taking a weapon still requires current observations.
+- Zone: current/next circles, future-circle queries and danger at an estimated arrival time.
+- Projectiles: swept paths catch fast bullets crossing between old sample points. Mortar paths use gravity and conservative splash estimates.
+- Cover: solids reduce weapon exposure. Trees do not count as bullet cover. Four new cover rays per decision bound the work; unchecked clearance stays dangerous. Cover terrain rays use up to 12 samples; firing and collision checks retain their finer sampling.
+
+The navigator rechecks route danger on map changes and periodically while moving. More dangerous routes restart their bounded search. Partial route steps are retained for inspection. The bot does not know hidden spawns, unseen global opponents or NPC homes.
+
+Snapshots copy their data, so later updates cannot alter saved history. Knowledge, resource memory, branches, heat cells, route search and geometry caches are bounded.
+
+## Inspect the map
+
+Open reports/virtual_map.html in a browser. It works offline, with a timeline, pan/zoom, follow camera and nine layer toggles. It shows the actual recorded observations together with our estimates and decisions. Those observations do not react to bot actions.
+
+To rebuild it:
+
+~~~sh
+python3 tools/export_map_viewer.py
+~~~
+
+If the kit is outside this folder, set MECHFIGHT_KIT to the kit root containing protocol.md, arena/ and check/. All test/viewer helpers honor it. This keeps development downloads out of a browser-upload folder.
+
+Optional protocol debug drawings are enabled with MECH_DEBUG_MAP=1. They show capped routes, actor positions and predictions inside normal action messages. This mode makes no network calls or file writes; it stays off by default.
+
+The viewer and model checks cover fast/vertical projectiles, solid cover versus trees, live memory settings, multiple hypotheses, zone forecasts, resource expiry, snapshot independence, caps, changed routes and finer-grid retries. Browser render, timeline, layer and camera checks are recorded in reports/viewer_check.json.
 
 ## Strategy
 
@@ -48,7 +81,7 @@ The official checker tests protocol and response times. Its recorded world does 
 
 ## Docker and VM checks
 
-The Dockerfile follows the official Python Dockerfile, pins the base image by digest, and copies only the five runtime modules. It does not bundle the map. On Linux with Docker:
+The Dockerfile follows the official Python Dockerfile, pins the base image by digest, and copies only the six runtime modules. It does not bundle the map. On Linux with Docker:
 
 ~~~sh
 sudo docker build --platform linux/amd64 -t mech-agent:map-aware .
@@ -64,7 +97,7 @@ Reports:
 - reports/test_matrix.md: workstation five-level results on seeds 17 and 29.
 - reports/official-native.json: workstation official checker output and exact command.
 - reports/map_coverage.json: loaded map coverage and source hashes.
-- reports/vm/: final VM unit tests, five-level runs, official native/Docker checks, image details and sandbox memory.
+- reports/map-foundation-vm/: current VM unit tests, five-level runs, official native/Docker checks and sandbox memory. reports/vm/ preserves the earlier version.
 
 The latest measured results are summarized in reports/validation_summary.json. All timings are measurements on the named host, not match scores.
 
